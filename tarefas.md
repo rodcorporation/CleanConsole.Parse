@@ -1,10 +1,10 @@
 # Lista de Tarefas do Projeto CLI Argument Parser
 
 ## 1. Configuração do Projeto
-- [ ] **1.1 Criar Solução:** Criar solução .NET 10 (`CleanConsole.Parse.sln`).
-- [ ] **1.2 Criar Projeto Core:** Criar projeto de biblioteca de classes (`CleanConsole.Parse`) rodando em .NET 10.
-- [ ] **1.3 Criar Projeto de Testes:** Criar projeto de testes unitários (`CleanConsole.Parse.Tests`) usando xUnit.
-- [ ] **1.4 Configurar Referências:** Adicionar referência do projeto Core no projeto de Testes.
+- [x] **1.1 Criar Solução:** Criar solução .NET 10 (`CleanConsole.Parse.sln`).
+- [x] **1.2 Criar Projeto Core:** Criar projeto de biblioteca de classes (`CleanConsole.Parse`) rodando em .NET 10.
+- [x] **1.3 Criar Projeto de Testes:** Criar projeto de testes unitários (`CleanConsole.Parse.Tests`) usando xUnit.
+- [x] **1.4 Configurar Referências:** Adicionar referência do projeto Core no projeto de Testes.
 
 ## 2. Definição de Metadados (Atributos)
 - [ ] **2.1 Implementar `[ProgramDef]`:** Criar atributo com propriedades `Name` (string), `Description` (string), e `PrintSummary` (bool) conforme RF10.
