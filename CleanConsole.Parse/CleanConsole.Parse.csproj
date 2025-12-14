@@ -4,6 +4,26 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    
+    <!-- NuGet Metadata -->
+    <PackageId>CleanConsole.Parse</PackageId>
+    <Title>CleanConsole.Parse</Title>
+    <Authors>CleanConsole Contributors</Authors>
+    <Description>A clean, declarative, and robust command-line argument parser for .NET 10. Eliminate boilerplate code with attribute-based configuration.</Description>
+    <PackageTags>cli;parser;console;arguments;command-line;dotnet;attributes;clean-code</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/YOUR_USER/CleanConsole.Parse</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/YOUR_USER/CleanConsole.Parse</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    
+    <!-- Build Properties -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Version>1.0.0</Version> <!-- Base version, will be overridden by CI -->
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
 </Project>
