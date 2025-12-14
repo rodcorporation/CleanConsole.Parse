@@ -33,9 +33,101 @@ public static class CleanParser
         ValidateConfiguration<T>();
 
         var tokens = Tokenize(args);
+        var instance = new T();
+        var type = typeof(T);
+        var properties = type.GetProperties();
 
-        // Parsing logic will be implemented in future tasks (Task 5+)
-        return new T();
+        // Map tokens to properties
+        foreach (var prop in properties)
+        {
+            var optionAttr = prop.GetCustomAttribute<OptionAttribute>();
+            if (optionAttr == null) continue;
+
+            // Encontrar o último token que corresponde a esta opção (Last Wins)
+            var match = tokens.LastOrDefault(t => 
+                string.Equals(t.Key, optionAttr.OptionName, StringComparison.OrdinalIgnoreCase) ||
+                (!string.IsNullOrEmpty(optionAttr.ShortOptionName) && string.Equals(t.Key, optionAttr.ShortOptionName, StringComparison.OrdinalIgnoreCase))
+            );
+
+            // Se não encontrou token para esta opção, pula (mantém valor default)
+            // Note: tokens é List<(string Key, string? Value)>, default é (null, null) se struct, mas LastOrDefault retorna default(ValueTuple) que é (null, null).
+            // Precisamos verificar se Key não é null.
+            if (match.Key == null) continue;
+
+            // 5.6 Lógica Bool/Flag e 5.7 Validar Valor Ausente
+            if (prop.PropertyType == typeof(bool))
+            {
+                if (match.Value == null)
+                {
+                    // Flag presente sem valor explícito = true
+                    prop.SetValue(instance, true);
+                }
+                else
+                {
+                    // Flag com valor explícito (ex: --verbose:false)
+                    if (bool.TryParse(match.Value, out bool boolResult))
+                    {
+                        prop.SetValue(instance, boolResult);
+                    }
+                    else
+                    {
+                        throw new CleanParserException($"O valor '{match.Value}' não é válido para o argumento '{optionAttr.OptionName}'. Esperava-se um 'Boolean'.");
+                    }
+                }
+            }
+            else
+            {
+                // Para não-booleanos, valor é obrigatório se a chave foi passada
+                if (match.Value == null)
+                {
+                    throw new CleanParserException($"O argumento '{match.Key}' exige um valor, mas nenhum foi fornecido.");
+                }
+
+                // Conversão de Tipos
+                try
+                {
+                    object convertedValue = null;
+
+                    if (prop.PropertyType == typeof(string))
+                    {
+                        convertedValue = match.Value;
+                    }
+                    else if (prop.PropertyType == typeof(int))
+                    {
+                        if (int.TryParse(match.Value, out int intResult))
+                        {
+                            convertedValue = intResult;
+                        }
+                        else
+                        {
+                            throw new CleanParserException($"O valor '{match.Value}' não é válido para o argumento '{optionAttr.OptionName}'. Esperava-se um 'Int32'.");
+                        }
+                    }
+                    else if (prop.PropertyType == typeof(double))
+                    {
+                        // 5.5 Conversão Double (Invariant Culture)
+                        if (double.TryParse(match.Value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double doubleResult))
+                        {
+                            convertedValue = doubleResult;
+                        }
+                        else
+                        {
+                            throw new CleanParserException($"O valor '{match.Value}' não é válido para o argumento '{optionAttr.OptionName}'. Esperava-se um 'Double'.");
+                        }
+                    }
+
+                    prop.SetValue(instance, convertedValue);
+                }
+                catch (Exception ex) when (ex is not CleanParserException)
+                {
+                    // Caso genérico de erro de set (improvável com os checks acima, mas segurança)
+                    throw new CleanParserException($"Erro ao definir valor para '{optionAttr.OptionName}': {ex.Message}", ex);
+                }
+            }
+        }
+
+        // Validação de Grupos será implementada na Tarefa 6
+        return instance;
     }
 
     /// <summary>

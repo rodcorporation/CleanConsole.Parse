@@ -28,13 +28,13 @@
 - [x] **4.4 Tratamento de Aspas:** Implementar lógica para sanitizar o valor, removendo aspas envolventes se houver (ex: `--msg="Olá"` -> valor: `Olá`).
 
 ## 5. Mapeamento e Conversão de Tipos
-- [ ] **5.1 Loop de Reflection (RF01):** Implementar iteração sobre as propriedades da classe alvo.
-- [ ] **5.2 Estratégia de Sobrescrita:** Definir comportamento para argumentos repetidos (ex: `-p:80 -p:90`). Adotar estratégia "Last Wins" (o último valor prevalece) para tipos primitivos.
-- [ ] **5.3 Conversão String:** Mapear valores para propriedades `string`.
-- [ ] **5.4 Conversão Int (RF03, RF08):** Mapear valores para `int` com `int.TryParse`.
-- [ ] **5.5 Conversão Double (RF03, RF08):** Mapear valores para `double` forçando `CultureInfo.InvariantCulture` para garantir que o formato `.` (ponto) seja aceito consistentemente independente do Locale do OS.
-- [ ] **5.6 Lógica Bool/Flag (RF05):** Implementar lógica onde a presença do argumento define `true`. Suportar valores explícitos (`:true`, `:false`) case-insensitive.
-- [ ] **5.7 Validar Valor Ausente (RF08):** Lançar exceção se um argumento não booleano for fornecido sem valor ("O argumento '{0}' exige um valor...").
+- [x] **5.1 Loop de Reflection (RF01):** Implementar iteração sobre as propriedades da classe alvo.
+- [x] **5.2 Estratégia de Sobrescrita:** Definir comportamento para argumentos repetidos (ex: `-p:80 -p:90`). Adotar estratégia "Last Wins" (o último valor prevalece) para tipos primitivos.
+- [x] **5.3 Conversão String:** Mapear valores para propriedades `string`.
+- [x] **5.4 Conversão Int (RF03, RF08):** Mapear valores para `int` com `int.TryParse`.
+- [x] **5.5 Conversão Double (RF03, RF08):** Mapear valores para `double` forçando `CultureInfo.InvariantCulture` para garantir que o formato `.` (ponto) seja aceito consistentemente independente do Locale do OS.
+- [x] **5.6 Lógica Bool/Flag (RF05):** Implementar lógica onde a presença do argumento define `true`. Suportar valores explícitos (`:true`, `:false`) case-insensitive.
+- [x] **5.7 Validar Valor Ausente (RF08):** Lançar exceção se um argumento não booleano for fornecido sem valor ("O argumento '{0}' exige um valor...").
 
 ## 6. Validação de Regras de Negócio (Grupos)
 - [ ] **6.1 Coletar Estado dos Grupos:** Rastrear quais opções de cada grupo foram efetivamente preenchidas.
