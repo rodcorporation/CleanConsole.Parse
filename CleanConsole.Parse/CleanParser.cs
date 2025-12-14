@@ -32,7 +32,9 @@ public static class CleanParser
     {
         ValidateConfiguration<T>();
 
-        // Parsing logic will be implemented in future tasks (Task 4+)
+        var tokens = Tokenize(args);
+
+        // Parsing logic will be implemented in future tasks (Task 5+)
         return new T();
     }
 
@@ -114,5 +116,53 @@ public static class CleanParser
 
         if (name.Contains(" ") || name.Contains(":") || name.Contains("="))
             throw new CleanParserException($"Configuration Error: {context} '{name}' contains invalid characters (spaces or separators).");
+    }
+
+    private static List<(string Key, string? Value)> Tokenize(string[] args)
+    {
+        var tokens = new List<(string Key, string? Value)>();
+
+        foreach (var arg in args)
+        {
+            if (string.IsNullOrWhiteSpace(arg)) continue;
+
+            // RF04 - Proibição de Espaços / Validação de Prefixo
+            // Se não começa com prefixo, é considerado um valor solto ("orphan value") que viola a regra de espaços.
+            if (!arg.StartsWith("-") && !arg.StartsWith("/"))
+            {
+                 throw new CleanParserException($"Erro de sintaxe no argumento '{arg}'. Espaços não são permitidos. Use o formato 'Opcao:valor' ou 'Opcao=valor' para corrigir.");
+            }
+
+            // Normalizar Prefixo e Extrair Key
+            var cleanArg = arg;
+            if (cleanArg.StartsWith("--")) cleanArg = cleanArg.Substring(2);
+            else if (cleanArg.StartsWith("-")) cleanArg = cleanArg.Substring(1);
+            else if (cleanArg.StartsWith("/")) cleanArg = cleanArg.Substring(1);
+
+            // Split Key/Value
+            string key;
+            string? value = null;
+
+            int sepIndex = cleanArg.IndexOfAny(new[] { ':', '=' });
+            if (sepIndex >= 0)
+            {
+                key = cleanArg.Substring(0, sepIndex);
+                value = cleanArg.Substring(sepIndex + 1);
+
+                // Remove aspas do valor (Sanitização)
+                if (!string.IsNullOrEmpty(value) && value.Length >= 2 && value.StartsWith("\"") && value.EndsWith("\""))
+                {
+                    value = value.Substring(1, value.Length - 2);
+                }
+            }
+            else
+            {
+                key = cleanArg;
+            }
+
+            tokens.Add((key, value));
+        }
+
+        return tokens;
     }
 }

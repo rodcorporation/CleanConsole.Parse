@@ -22,10 +22,10 @@
 - [x] **3.7 Validar Formato dos Nomes:** Garantir que `OptionName` e `ShortOptionName` definidos no atributo não contenham prefixos (`-`, `/`) ou caracteres inválidos (espaços, separadores) para evitar ambiguidade.
 
 ## 4. Tokenização e Sintaxe (Core Logic)
-- [ ] **4.1 Implementar Splitter de Argumentos Seguro:** Criar lógica para separar chave e valor usando a *primeira* ocorrência de `:` ou `=`. Isso permite valores que contenham esses caracteres (ex: URLs ou Connection Strings).
-- [ ] **4.2 Validar Formato Estrito (RF04):** Implementar validação que rejeita argumentos sem separador (exceto flags), garantindo a proibição de espaços (Exceção: "Erro de sintaxe no argumento '{0}'...").
-- [ ] **4.3 Normalizar e Validar Prefixos:** Implementar lógica para identificar e remover prefixos (`-`, `--`, `/`).
-- [ ] **4.4 Tratamento de Aspas:** Implementar lógica para sanitizar o valor, removendo aspas envolventes se houver (ex: `--msg="Olá"` -> valor: `Olá`).
+- [x] **4.1 Implementar Splitter de Argumentos Seguro:** Criar lógica para separar chave e valor usando a *primeira* ocorrência de `:` ou `=`. Isso permite valores que contenham esses caracteres (ex: URLs ou Connection Strings).
+- [x] **4.2 Validar Formato Estrito (RF04):** Implementar validação que rejeita argumentos sem separador (exceto flags), garantindo a proibição de espaços (Exceção: "Erro de sintaxe no argumento '{0}'...").
+- [x] **4.3 Normalizar e Validar Prefixos:** Implementar lógica para identificar e remover prefixos (`-`, `--`, `/`).
+- [x] **4.4 Tratamento de Aspas:** Implementar lógica para sanitizar o valor, removendo aspas envolventes se houver (ex: `--msg="Olá"` -> valor: `Olá`).
 
 ## 5. Mapeamento e Conversão de Tipos
 - [ ] **5.1 Loop de Reflection (RF01):** Implementar iteração sobre as propriedades da classe alvo.
