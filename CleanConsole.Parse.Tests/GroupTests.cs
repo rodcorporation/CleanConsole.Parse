@@ -14,16 +14,16 @@ public class GroupTests
     public class GroupConfig
     {
         [Option("a", Group = "Exact")]
-        public string A { get; set; }
+        public string? A { get; set; }
 
         [Option("b", Group = "Exact")]
-        public string B { get; set; }
+        public string? B { get; set; }
 
         [Option("x", Group = "AtLeast")]
-        public string X { get; set; }
+        public string? X { get; set; }
 
         [Option("y", Group = "AtLeast")]
-        public string Y { get; set; }
+        public string? Y { get; set; }
     }
 
     // --- ExactOne Tests ---

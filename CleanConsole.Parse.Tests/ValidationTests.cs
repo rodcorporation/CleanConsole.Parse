@@ -47,23 +47,23 @@ public class ValidationTests
     private class DuplicateNameConfig
     {
         [Option("file")]
-        public string File1 { get; set; }
+        public string? File1 { get; set; }
 
         [Option("file")]
-        public string File2 { get; set; }
+        public string? File2 { get; set; }
     }
 
     [ProgramDef(Name = "Test", Description = "Test")]
     private class InvalidGroupConfig
     {
         [Option("file", Group = "NonExistent")]
-        public string File { get; set; }
+        public string? File { get; set; }
     }
 
     [ProgramDef(Name = "Test", Description = "Test")]
     private class PrefixNameConfig
     {
         [Option("-file")]
-        public string File { get; set; }
+        public string? File { get; set; }
     }
 }

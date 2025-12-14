@@ -101,7 +101,7 @@ public static class CleanParser
                 // Conversão de Tipos
                 try
                 {
-                    object convertedValue = null;
+                    object? convertedValue = null;
 
                     if (prop.PropertyType == typeof(string))
                     {

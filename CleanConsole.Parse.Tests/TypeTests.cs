@@ -11,7 +11,7 @@ public class TypeTests
     public class TypeConfig
     {
         [Option("str")]
-        public string Str { get; set; }
+        public string? Str { get; set; }
 
         [Option("int")]
         public int IntVal { get; set; }

@@ -10,7 +10,7 @@ public class HelpTests
     public class HelpConfig
     {
         [Option("file", ShortOptionName = "f")]
-        public string File { get; set; }
+        public string? File { get; set; }
 
         [Option("verbose")]
         public bool Verbose { get; set; }

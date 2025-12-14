@@ -14,7 +14,7 @@ public class SyntaxTests
         public int Port { get; set; }
 
         [Option("msg")]
-        public string Msg { get; set; }
+        public string? Msg { get; set; }
     }
 
     [Fact]

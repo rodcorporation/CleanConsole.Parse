@@ -1,0 +1,12 @@
+C:\Users\rodri\Desktop\CleanConsole.Parse\CleanConsole.Parse\bin\Debug\net10.0\CleanConsole.Parse.deps.json
+C:\Users\rodri\Desktop\CleanConsole.Parse\CleanConsole.Parse\bin\Debug\net10.0\CleanConsole.Parse.dll
+C:\Users\rodri\Desktop\CleanConsole.Parse\CleanConsole.Parse\bin\Debug\net10.0\CleanConsole.Parse.pdb
+C:\Users\rodri\Desktop\CleanConsole.Parse\CleanConsole.Parse\obj\Debug\net10.0\CleanConsole.Parse.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\rodri\Desktop\CleanConsole.Parse\CleanConsole.Parse\obj\Debug\net10.0\CleanConsole.Parse.AssemblyInfoInputs.cache
+C:\Users\rodri\Desktop\CleanConsole.Parse\CleanConsole.Parse\obj\Debug\net10.0\CleanConsole.Parse.AssemblyInfo.cs
+C:\Users\rodri\Desktop\CleanConsole.Parse\CleanConsole.Parse\obj\Debug\net10.0\CleanConsole.Parse.csproj.CoreCompileInputs.cache
+C:\Users\rodri\Desktop\CleanConsole.Parse\CleanConsole.Parse\obj\Debug\net10.0\CleanConsole.Parse.dll
+C:\Users\rodri\Desktop\CleanConsole.Parse\CleanConsole.Parse\obj\Debug\net10.0\refint\CleanConsole.Parse.dll
+C:\Users\rodri\Desktop\CleanConsole.Parse\CleanConsole.Parse\obj\Debug\net10.0\CleanConsole.Parse.pdb
+C:\Users\rodri\Desktop\CleanConsole.Parse\CleanConsole.Parse\obj\Debug\net10.0\ref\CleanConsole.Parse.dll
+C:\Users\rodri\Desktop\CleanConsole.Parse\CleanConsole.Parse\obj\Debug\net10.0\CleanConsole.Parse.sourcelink.json
