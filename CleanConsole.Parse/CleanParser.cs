@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using CleanConsole.Parse.Attributes;
 using CleanConsole.Parse.Exceptions;
 
@@ -55,6 +56,8 @@ public static class CleanParser
             );
 
             // Se não encontrou token para esta opção, pula (mantém valor default)
+            // Note: tokens é List<(string Key, string? Value)>, default é (null, null) se struct, mas LastOrDefault retorna default(ValueTuple) que é (null, null).
+            // Precisamos verificar se Key não é null.
             if (match.Key == null) continue;
 
             // Increment group count if applicable
@@ -158,7 +161,78 @@ public static class CleanParser
             }
         }
 
+        // 7.3 Implementar PrintSummary
+        var programDef = type.GetCustomAttribute<ProgramDefAttribute>();
+        if (programDef != null && programDef.PrintSummary)
+        {
+            PrintSummary(instance, properties);
+        }
+
         return instance;
+    }
+
+    /// <summary>
+    /// Generates a help text based on the attributes defined in type T.
+    /// </summary>
+    /// <typeparam name="T">The configuration type.</typeparam>
+    /// <returns>A formatted help string.</returns>
+    public static string GetHelpText<T>()
+    {
+        var type = typeof(T);
+        var programDef = type.GetCustomAttribute<ProgramDefAttribute>();
+        var sb = new StringBuilder();
+
+        if (programDef != null)
+        {
+            if (!string.IsNullOrEmpty(programDef.Name))
+                sb.AppendLine(programDef.Name);
+            
+            if (!string.IsNullOrEmpty(programDef.Description))
+                sb.AppendLine(programDef.Description);
+            
+            sb.AppendLine();
+        }
+
+        sb.AppendLine("Options:");
+
+        var properties = type.GetProperties();
+        foreach (var prop in properties)
+        {
+            var opt = prop.GetCustomAttribute<OptionAttribute>();
+            if (opt == null) continue;
+
+            var shortName = !string.IsNullOrEmpty(opt.ShortOptionName) ? $"-{opt.ShortOptionName}, " : "    ";
+            var longName = $"--{opt.OptionName}";
+            
+            var line = $"  {shortName}{longName}";
+            
+            // Padding para alinhar
+            if (line.Length < 30)
+                line = line.PadRight(30);
+            
+            if (!string.IsNullOrEmpty(opt.Group))
+            {
+                line += $" [Group: {opt.Group}]";
+            }
+
+            sb.AppendLine(line);
+        }
+
+        return sb.ToString();
+    }
+
+    private static void PrintSummary<T>(T instance, PropertyInfo[] properties)
+    {
+        Console.WriteLine("Summary of Options:");
+        foreach (var prop in properties)
+        {
+            var opt = prop.GetCustomAttribute<OptionAttribute>();
+            if (opt == null) continue;
+
+            var value = prop.GetValue(instance);
+            Console.WriteLine($"  {opt.OptionName}: {value}");
+        }
+        Console.WriteLine();
     }
 
     /// <summary>
@@ -213,11 +287,6 @@ public static class CleanParser
                 }
             }
             
-            // Check cross-collision (Long name colliding with Short name of another, usually allowed but let's check strictness if needed. 
-            // PRD doesn't explicitly forbid collision between Long and Short of different options, but usually they are distinct namespaces.
-            // However, ensuring they are unique across the board avoids ambiguity if user inputs "-name".
-            // Implementation choice: Keep separate for now unless conflict arises.
-            
             // 3.5 Validar Referência de Grupos
             if (!string.IsNullOrEmpty(optionAttr.Group))
             {
@@ -250,7 +319,6 @@ public static class CleanParser
             if (string.IsNullOrWhiteSpace(arg)) continue;
 
             // RF04 - Proibição de Espaços / Validação de Prefixo
-            // Se não começa com prefixo, é considerado um valor solto ("orphan value") que viola a regra de espaços.
             if (!arg.StartsWith("-") && !arg.StartsWith("/"))
             {
                  throw new CleanParserException($"Erro de sintaxe no argumento '{arg}'. Espaços não são permitidos. Use o formato 'Opcao:valor' ou 'Opcao=valor' para corrigir.");

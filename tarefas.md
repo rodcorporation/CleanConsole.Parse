@@ -42,10 +42,10 @@
 - [x] **6.3 Validar `AtLeastOne` (RF07, RF08):** Lançar erro se contagem == 0 ("Requisito não atendido: Pelo menos uma opção do grupo '{0}' deve ser fornecida.").
 
 ## 7. Funcionalidades de Saída (UX)
-- [ ] **7.1 Gerador de Ajuda (RF02):** Criar método `GetHelpText()`.
-- [ ] **7.2 Formatação de Tabela (UX):** Garantir que a lista de opções no Help Text seja alinhada verticalmente (padding) para melhor leitura no console.
-- [ ] **7.3 Implementar `PrintSummary` (RF10):** Adicionar verificação final que imprime os valores mapeados no console se a flag estiver ativa.
-- [ ] **7.4 Integração de Erro:** Garantir que a `CleanParserException` contenha referência ao gerador de ajuda ou dados suficientes para exibi-la.
+- [x] **7.1 Gerador de Ajuda (RF02):** Criar método `GetHelpText()`.
+- [x] **7.2 Formatação de Tabela (UX):** Garantir que a lista de opções no Help Text seja alinhada verticalmente (padding) para melhor leitura no console.
+- [x] **7.3 Implementar `PrintSummary` (RF10):** Adicionar verificação final que imprime os valores mapeados no console se a flag estiver ativa.
+- [x] **7.4 Integração de Erro:** Garantir que a `CleanParserException` contenha referência ao gerador de ajuda ou dados suficientes para exibi-la.
 
 ## 8. Testes (QA)
 - [ ] **8.1 Testes de Sintaxe (T01, T02):** Validar formatos aceitos e rejeição de espaços.
