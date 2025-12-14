@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v9.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v9.0": {
+      "CleanConsole.Parse/1.0.0": {
+        "runtime": {
+          "CleanConsole.Parse.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "CleanConsole.Parse/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

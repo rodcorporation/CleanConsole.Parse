@@ -13,13 +13,13 @@
 - [x] **2.4 Implementar `[Option]`:** Criar atributo de propriedade com `OptionName` (obrigatório), `ShortOptionName` (opcional), e `Group` (opcional) conforme RF06.
 
 ## 3. Estrutura do Parser e Validação de Inicialização (Startup Check)
-- [ ] **3.1 Criar Classe Parser:** Criar a classe principal responsável pelo parsing, aceitando um tipo genérico `T`.
-- [ ] **3.2 Criar Exceção Customizada:** Implementar `CleanParserException` para encapsular erros de parsing, facilitando o tratamento pelo consumidor (RF08).
-- [ ] **3.3 Validar Tipos Suportados (Refinamento RF03):** Validar na inicialização se todas as propriedades decoradas com `[Option]` são de tipos suportados (`string`, `int`, `double`, `bool`). Lançar exceção se houver tipos não suportados (ex: `DateTime`).
-- [ ] **3.4 Validar Duplicidade de Opções (RF09):** Implementar verificação para garantir que não existem `OptionName` ou `ShortOptionName` duplicados na classe alvo.
-- [ ] **3.5 Validar Referência de Grupos (RF09):** Garantir que toda propriedade com `Group` definido aponte para um `[OptionGroup]` existente na classe.
-- [ ] **3.6 Validar Duplicidade de Grupos (RF09):** Garantir que não existam múltiplos atributos `[OptionGroup]` com o mesmo nome.
-- [ ] **3.7 Validar Formato dos Nomes:** Garantir que `OptionName` e `ShortOptionName` definidos no atributo não contenham prefixos (`-`, `/`) ou caracteres inválidos (espaços, separadores) para evitar ambiguidade.
+- [x] **3.1 Criar Classe Parser:** Criar a classe principal responsável pelo parsing, aceitando um tipo genérico `T`.
+- [x] **3.2 Criar Exceção Customizada:** Implementar `CleanParserException` para encapsular erros de parsing, facilitando o tratamento pelo consumidor (RF08).
+- [x] **3.3 Validar Tipos Suportados (Refinamento RF03):** Validar na inicialização se todas as propriedades decoradas com `[Option]` são de tipos suportados (`string`, `int`, `double`, `bool`). Lançar exceção se houver tipos não suportados (ex: `DateTime`).
+- [x] **3.4 Validar Duplicidade de Opções (RF09):** Implementar verificação para garantir que não existem `OptionName` ou `ShortOptionName` duplicados na classe alvo.
+- [x] **3.5 Validar Referência de Grupos (RF09):** Garantir que toda propriedade com `Group` definido aponte para um `[OptionGroup]` existente na classe.
+- [x] **3.6 Validar Duplicidade de Grupos (RF09):** Garantir que não existam múltiplos atributos `[OptionGroup]` com o mesmo nome.
+- [x] **3.7 Validar Formato dos Nomes:** Garantir que `OptionName` e `ShortOptionName` definidos no atributo não contenham prefixos (`-`, `/`) ou caracteres inválidos (espaços, separadores) para evitar ambiguidade.
 
 ## 4. Tokenização e Sintaxe (Core Logic)
 - [ ] **4.1 Implementar Splitter de Argumentos Seguro:** Criar lógica para separar chave e valor usando a *primeira* ocorrência de `:` ou `=`. Isso permite valores que contenham esses caracteres (ex: URLs ou Connection Strings).

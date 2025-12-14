@@ -411,6 +411,16 @@
         "build": {
           "build/net6.0/xunit.runner.visualstudio.props": {}
         }
+      },
+      "CleanConsole.Parse/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "compile": {
+          "bin/placeholder/CleanConsole.Parse.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/CleanConsole.Parse.dll": {}
+        }
       }
     }
   },
@@ -932,10 +942,16 @@
         "xunit.runner.visualstudio.2.8.2.nupkg.sha512",
         "xunit.runner.visualstudio.nuspec"
       ]
+    },
+    "CleanConsole.Parse/1.0.0": {
+      "type": "project",
+      "path": "../CleanConsole.Parse/CleanConsole.Parse.csproj",
+      "msbuildProject": "../CleanConsole.Parse/CleanConsole.Parse.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net9.0": [
+      "CleanConsole.Parse >= 1.0.0",
       "Microsoft.NET.Test.Sdk >= 17.12.0",
       "coverlet.collector >= 6.0.2",
       "xunit >= 2.9.2",
@@ -973,7 +989,11 @@
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\rodri\\Desktop\\CleanConsole.Parse\\CleanConsole.Parse\\CleanConsole.Parse.csproj": {
+              "projectPath": "C:\\Users\\rodri\\Desktop\\CleanConsole.Parse\\CleanConsole.Parse\\CleanConsole.Parse.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
