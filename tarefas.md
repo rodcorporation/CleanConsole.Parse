@@ -37,9 +37,9 @@
 - [x] **5.7 Validar Valor Ausente (RF08):** Lançar exceção se um argumento não booleano for fornecido sem valor ("O argumento '{0}' exige um valor...").
 
 ## 6. Validação de Regras de Negócio (Grupos)
-- [ ] **6.1 Coletar Estado dos Grupos:** Rastrear quais opções de cada grupo foram efetivamente preenchidas.
-- [ ] **6.2 Validar `ExactOne` (RF07, RF08):** Lançar erro se contagem != 1 ("Conflito de opções: O grupo '{0}' exige exatamente uma opção...").
-- [ ] **6.3 Validar `AtLeastOne` (RF07, RF08):** Lançar erro se contagem == 0 ("Requisito não atendido: Pelo menos uma opção do grupo '{0}' deve ser fornecida.").
+- [x] **6.1 Coletar Estado dos Grupos:** Rastrear quais opções de cada grupo foram efetivamente preenchidas.
+- [x] **6.2 Validar `ExactOne` (RF07, RF08):** Lançar erro se contagem != 1 ("Conflito de opções: O grupo '{0}' exige exatamente uma opção...").
+- [x] **6.3 Validar `AtLeastOne` (RF07, RF08):** Lançar erro se contagem == 0 ("Requisito não atendido: Pelo menos uma opção do grupo '{0}' deve ser fornecida.").
 
 ## 7. Funcionalidades de Saída (UX)
 - [ ] **7.1 Gerador de Ajuda (RF02):** Criar método `GetHelpText()`.

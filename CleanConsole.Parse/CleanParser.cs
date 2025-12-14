@@ -36,6 +36,11 @@ public static class CleanParser
         var instance = new T();
         var type = typeof(T);
         var properties = type.GetProperties();
+        var definedGroups = type.GetCustomAttributes<OptionGroupAttribute>().ToList();
+        
+        // Rastreamento para validação de grupos
+        // Key: GroupName, Value: Count of options set
+        var groupCounts = definedGroups.ToDictionary(g => g.Name, g => 0);
 
         // Map tokens to properties
         foreach (var prop in properties)
@@ -50,9 +55,16 @@ public static class CleanParser
             );
 
             // Se não encontrou token para esta opção, pula (mantém valor default)
-            // Note: tokens é List<(string Key, string? Value)>, default é (null, null) se struct, mas LastOrDefault retorna default(ValueTuple) que é (null, null).
-            // Precisamos verificar se Key não é null.
             if (match.Key == null) continue;
+
+            // Increment group count if applicable
+            if (!string.IsNullOrEmpty(optionAttr.Group))
+            {
+                if (groupCounts.ContainsKey(optionAttr.Group))
+                {
+                    groupCounts[optionAttr.Group]++;
+                }
+            }
 
             // 5.6 Lógica Bool/Flag e 5.7 Validar Valor Ausente
             if (prop.PropertyType == typeof(bool))
@@ -126,7 +138,26 @@ public static class CleanParser
             }
         }
 
-        // Validação de Grupos será implementada na Tarefa 6
+        // 6. Validação de Regras de Negócio (Grupos)
+        foreach (var group in definedGroups)
+        {
+            int count = groupCounts[group.Name];
+            if (group.Type == Enums.OptionGroupType.ExactOne)
+            {
+                if (count != 1)
+                {
+                    throw new CleanParserException($"Conflito de opções: O grupo '{group.Name}' exige exatamente uma opção, mas foram fornecidas: {count}.");
+                }
+            }
+            else if (group.Type == Enums.OptionGroupType.AtLeastOne)
+            {
+                if (count == 0)
+                {
+                    throw new CleanParserException($"Requisito não atendido: Pelo menos uma opção do grupo '{group.Name}' deve ser fornecida.");
+                }
+            }
+        }
+
         return instance;
     }
 
