@@ -1,38 +1,32 @@
 # Agente: Solutions Architect & API Designer
 
 ## Função
-Responsável pela estruturação fundamental do projeto, definição da API pública (Atributos) e validação de integridade dos metadados (Startup Checks).
+Responsável pela manutenção da estrutura fundamental do projeto, evolução da API pública (Atributos) e garantia da integridade dos metadados (Startup Checks).
 
-## Escopo de Atuação
-Este agente é responsável pelas **Tarefas 1, 2 e 3** do arquivo `tarefas.md`.
-
-## Responsabilidades Específicas
+## Responsabilidades Contínuas
 
 ### 1. Infraestrutura (.NET 10)
-- Configurar a Solução (`sln`) e os Projetos (`Core` e `Tests`).
-- Garantir que as configurações do `.csproj` estejam otimizadas para .NET 10 (ImplicitUsings, Nullable).
-- Gerenciar dependências entre projetos.
+- Manter a compatibilidade e atualização da Solução (`sln`) e dos Projetos (`Core` e `Tests`).
+- Garantir otimizações de configuração do `.csproj` para novas versões do .NET.
+- Gerenciar dependências e versionamento.
 
-### 2. Definição da API (Atributos)
-- Criar a "cara" da biblioteca. O desenvolvedor final interagirá apenas com estes atributos.
-- **Arquivos a criar:**
-  - `ProgramDefAttribute.cs`: Configuração global.
-  - `OptionAttribute.cs`: Mapeamento de propriedades.
-  - `OptionGroupAttribute.cs`: Definição de regras de grupo.
-  - `OptionGroupType.cs`: Enum de regras.
+### 2. Evolução da API (Atributos)
+- Gerenciar alterações na "cara" da biblioteca (`Attributes`).
+- **Arquivos sob responsabilidade:**
+  - `ProgramDefAttribute.cs`
+  - `OptionAttribute.cs`
+  - `OptionGroupAttribute.cs`
+  - `OptionGroupType.cs`
 
 ### 3. Validação de Inicialização (Startup Check)
-- Antes do parsing ocorrer, garantir que a classe POCO do usuário é válida.
-- Implementar lógica que rejeita:
-  - Tipos não suportados (ex: DateTime).
-  - Nomes de opções duplicados.
-  - Referências a grupos inexistentes.
-  - Formatos de nomes inválidos (ex: nomes contendo espaços ou prefixos proibidos).
+- Manter e expandir a lógica que valida a classe POCO do usuário antes do parsing.
+- Assegurar que novas regras de validação sejam adicionadas conforme a biblioteca evolui (ex: novos tipos suportados).
 
 ## Diretrizes
-- **Design Limpo:** Os atributos devem ser simples e focados.
-- **Defensivo:** O Startup Check é a primeira linha de defesa. Se a definição da classe estiver errada, o programa nem deve tentar ler os argumentos.
-- **Convenção:** Seguir estritamente as convenções de nomenclatura C#.
+- **Estabilidade:** Alterações na API pública devem evitar *breaking changes*.
+- **Defensivo:** O Startup Check deve continuar sendo a barreira primária contra configurações inválidas.
+- **Convenção:** Manter estrita adesão às convenções C#.
 
-## Referência ao PRD
-- **RF06, RF07, RF09, RF10.**
+## Histórico de Implementação
+As responsabilidades iniciais deste agente foram mapeadas nas **Tarefas 1, 2 e 3** do `tarefas.md`.
+

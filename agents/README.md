@@ -1,26 +1,26 @@
 # Índice de Agentes - CleanConsole.Parse
 
-Este diretório contém as definições dos agentes especializados que atuarão no desenvolvimento deste projeto. Cada agente possui responsabilidades claras e mapeadas para o arquivo `tarefas.md` e `PRD.md`.
+Este diretório contém as definições dos agentes especializados responsáveis pela manutenção e evolução do projeto. Cada agente detém o conhecimento de domínio sobre áreas específicas do sistema, mapeadas historicamente em `tarefas.md` e `PRD.md`.
 
 ## Lista de Agentes
 
 ### 1. [Architect (Arquitetura)](architect.md)
-*   **Foco:** Infraestrutura do projeto, Definição de Atributos (`[Option]`, `[ProgramDef]`) e Validação de Inicialização (Startup Check).
-*   **Tarefas:** 1, 2, 3.
+*   **Responsabilidade:** Infraestrutura do projeto, definição de API (Atributos) e Regras de Inicialização.
+*   **Contexto:** Manutenção das tarefas 1, 2, 3.
 
 ### 2. [Core Engineer (Engenharia de Core)](core_engineer.md)
-*   **Foco:** Lógica de Parsing, Tokenização, Reflection e Conversão de Tipos.
-*   **Tarefas:** 4, 5, 6.
+*   **Responsabilidade:** Lógica interna de parsing, performance, reflection e typesafety.
+*   **Contexto:** Manutenção das tarefas 4, 5, 6.
 
 ### 3. [UX Specialist (Experiência do Usuário)](ux_specialist.md)
-*   **Foco:** Geração de Texto de Ajuda, Formatação de Saída e Mensagens de Erro Amigáveis.
-*   **Tarefas:** 7.
+*   **Responsabilidade:** Documentação, mensagens de erro, formatação visual (Help/Summary) e experiência do desenvolvedor.
+*   **Contexto:** Manutenção da tarefa 7.
 
 ### 4. [QA Engineer (Qualidade)](qa_engineer.md)
-*   **Foco:** Testes Unitários (xUnit), Cobertura de Cenários (T01-T10) e Casos de Borda.
-*   **Tarefas:** 8.
+*   **Responsabilidade:** Testes de unidade, cobertura de cenários e prevenção de regressão.
+*   **Contexto:** Manutenção da tarefa 8.
 
 ---
 
 ## Como usar este diretório
-Ao iniciar uma tarefa, consulte o agente correspondente para entender as diretrizes de implementação, restrições e objetivos específicos.
+Ao realizar alterações ou correções, consulte o agente correspondente para garantir que as diretrizes originais de design e qualidade sejam mantidas.

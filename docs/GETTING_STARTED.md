@@ -3,9 +3,15 @@
 Este guia mostra como configurar e usar o **CleanConsole.Parse** em sua aplicação .NET.
 
 ## Instalação
-*(Placeholder para comando NuGet)*
+
+Como este projeto ainda não está publicado no NuGet.org, você pode utilizá-lo de duas formas:
+
+1.  **Referência de Projeto (Local):** Adicione o projeto `CleanConsole.Parse.csproj` à sua solução e referencie-o diretamente.
+2.  **Build Local:** Gere o pacote `.nupkg` localmente (`dotnet pack`) e configure uma fonte de pacotes local.
+
 ```bash
-dotnet add package CleanConsole.Parse
+# Exemplo de adição via referência de projeto
+dotnet add reference ../CleanConsole.Parse/CleanConsole.Parse.csproj
 ```
 
 ## Exemplo Rápido
