@@ -48,11 +48,11 @@
 - [x] **7.4 Integração de Erro:** Garantir que a `CleanParserException` contenha referência ao gerador de ajuda ou dados suficientes para exibi-la.
 
 ## 8. Testes (QA)
-- [ ] **8.1 Testes de Sintaxe (T01, T02):** Validar formatos aceitos e rejeição de espaços.
-- [ ] **8.2 Testes de Aspas e Separadores:** Validar valores com aspas e valores contendo `:` ou `=` (ex: connection strings).
-- [ ] **8.3 Testes de Tipos Primitivos e Cultura (T03, T04, T05):** Validar conversões (incluindo Double com ponto) e mensagens de erro de tipo.
-- [ ] **8.4 Testes de Tipos Não Suportados:** Validar se o parser rejeita propriedades `DateTime` ou complexas na inicialização.
-- [ ] **8.5 Testes de Grupos (T06, T07, T08):** Validar lógica de `ExactOne` e `AtLeastOne`.
-- [ ] **8.6 Testes de Prefixos e Busca (T09):** Garantir flexibilidade de prefixos.
-- [ ] **8.7 Testes de Resumo (T10):** Verificar output visual.
-- [ ] **8.8 Testes de Metadados:** Garantir que definições inválidas na classe (duplicidades) lancem erro na inicialização.
+- [x] **8.1 Testes de Sintaxe (T01, T02):** Validar formatos aceitos e rejeição de espaços.
+- [x] **8.2 Testes de Aspas e Separadores:** Validar valores com aspas e valores contendo `:` ou `=` (ex: connection strings).
+- [x] **8.3 Testes de Tipos Primitivos e Cultura (T03, T04, T05):** Validar conversões (incluindo Double com ponto) e mensagens de erro de tipo.
+- [x] **8.4 Testes de Tipos Não Suportados:** Validar se o parser rejeita propriedades `DateTime` ou complexas na inicialização.
+- [x] **8.5 Testes de Grupos (T06, T07, T08):** Validar lógica de `ExactOne` e `AtLeastOne`.
+- [x] **8.6 Testes de Prefixos e Busca (T09):** Garantir flexibilidade de prefixos.
+- [x] **8.7 Testes de Resumo (T10):** Verificar output visual.
+- [x] **8.8 Testes de Metadados:** Garantir que definições inválidas na classe (duplicidades) lancem erro na inicialização.

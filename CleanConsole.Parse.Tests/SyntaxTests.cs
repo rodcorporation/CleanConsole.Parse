@@ -62,4 +62,12 @@ public class SyntaxTests
         
         Assert.Contains("Erro de sintaxe", ex.Message);
     }
+
+    [Fact]
+    public void Should_Handle_Mixed_Prefixes_Last_Wins()
+    {
+        // -port:10 then /port:20 -> Result 20
+        var res = CleanParser.Parse<SimpleConfig>(new[] { "-port:10", "/port:20" });
+        Assert.Equal(20, res.Port);
+    }
 }
