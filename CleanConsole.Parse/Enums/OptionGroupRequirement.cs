@@ -26,5 +26,10 @@ public enum OptionGroupRequirement
     /// No option from the group is mandatory, but at most one option can be provided.
     /// Error if >1 options are present.
     /// </summary>
-    AtMostOne
+    AtMostOne,
+
+    /// <summary>
+    /// Every option in the group is mandatory. Error if any option is missing.
+    /// </summary>
+    All
 }
