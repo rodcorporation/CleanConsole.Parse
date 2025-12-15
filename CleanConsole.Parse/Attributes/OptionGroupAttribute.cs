@@ -1,7 +1,6 @@
 using System;
-using CleanConsole.Parse.Enums;
 
-namespace CleanConsole.Parse.Attributes;
+namespace CleanConsole.Parse;
 
 /// <summary>
 /// Defines a logical group of options with specific validation rules.
@@ -18,5 +17,16 @@ public sealed class OptionGroupAttribute : Attribute
     /// <summary>
     /// The validation rule to apply to this group.
     /// </summary>
-    public OptionGroupType Type { get; set; }
+    public OptionGroupRequirement Require { get; }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="OptionGroupAttribute"/> class.
+    /// </summary>
+    /// <param name="name">The unique name of the group.</param>
+    /// <param name="require">The validation rule to apply to this group.</param>
+    public OptionGroupAttribute(string name, OptionGroupRequirement require)
+    {
+        Name = name;
+        Require = require;
+    }
 }

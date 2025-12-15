@@ -1,16 +1,13 @@
 using Xunit;
 using CleanConsole.Parse;
-using CleanConsole.Parse.Attributes;
-using CleanConsole.Parse.Exceptions;
-using CleanConsole.Parse.Enums;
 
 namespace CleanConsole.Parse.Tests;
 
 public class GroupTests
 {
-    [ProgramDef(Name = "Test", Description = "Test")]
-    [OptionGroup(Name = "Exact", Type = OptionGroupType.ExactOne)]
-    [OptionGroup(Name = "AtLeast", Type = OptionGroupType.AtLeastOne)]
+    [ProgramDefinition(Name = "Test", Description = "Test")]
+    [OptionGroup("Exact", OptionGroupRequirement.ExactOne)]
+    [OptionGroup("AtLeast", OptionGroupRequirement.AtLeastOne)]
     public class GroupConfig
     {
         [Option("a", Group = "Exact")]

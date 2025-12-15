@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using CleanConsole.Parse.Attributes;
-using CleanConsole.Parse.Exceptions;
 
 namespace CleanConsole.Parse;
 
@@ -145,24 +143,38 @@ public static class CleanParser
         foreach (var group in definedGroups)
         {
             int count = groupCounts[group.Name];
-            if (group.Type == Enums.OptionGroupType.ExactOne)
+
+            switch (group.Require)
             {
-                if (count != 1)
-                {
-                    throw new CleanParserException($"Conflito de opções: O grupo '{group.Name}' exige exatamente uma opção, mas foram fornecidas: {count}.");
-                }
-            }
-            else if (group.Type == Enums.OptionGroupType.AtLeastOne)
-            {
-                if (count == 0)
-                {
-                    throw new CleanParserException($"Requisito não atendido: Pelo menos uma opção do grupo '{group.Name}' deve ser fornecida.");
-                }
+                case OptionGroupRequirement.ExactOne:
+                    if (count != 1)
+                    {
+                        throw new CleanParserException($"Conflito de opções: O grupo '{group.Name}' exige exatamente uma opção, mas foram fornecidas: {count}.");
+                    }
+                    break;
+
+                case OptionGroupRequirement.AtLeastOne:
+                    if (count == 0)
+                    {
+                        throw new CleanParserException($"Requisito não atendido: Pelo menos uma opção do grupo '{group.Name}' deve ser fornecida.");
+                    }
+                    break;
+
+                case OptionGroupRequirement.AtMostOne:
+                    if (count > 1)
+                    {
+                        throw new CleanParserException($"Conflito de opções: O grupo '{group.Name}' permite no máximo uma opção, mas foram fornecidas: {count}.");
+                    }
+                    break;
+
+                case OptionGroupRequirement.None:
+                default:
+                    break;
             }
         }
 
         // 7.3 Implementar PrintSummary
-        var programDef = type.GetCustomAttribute<ProgramDefAttribute>();
+        var programDef = type.GetCustomAttribute<ProgramDefinitionAttribute>();
         if (programDef != null && programDef.PrintSummary)
         {
             PrintSummary(instance, properties);
@@ -179,7 +191,7 @@ public static class CleanParser
     public static string GetHelpText<T>()
     {
         var type = typeof(T);
-        var programDef = type.GetCustomAttribute<ProgramDefAttribute>();
+        var programDef = type.GetCustomAttribute<ProgramDefinitionAttribute>();
         var sb = new StringBuilder();
 
         if (programDef != null)

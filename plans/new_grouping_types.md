@@ -4,66 +4,81 @@
 **Data:** 15/12/2025
 
 ## 1. Objetivo
-Expandir a funcionalidade de agrupamento de opções (`OptionGroup`) para suportar cenários onde as opções não são estritamente obrigatórias, oferecendo maior flexibilidade na definição de interfaces de linha de comando.
+Expandir a funcionalidade de agrupamento de opções (`OptionGroup`) para suportar cenários onde as opções não são estritamente obrigatórias, oferecendo maior flexibilidade na definição de interfaces de linha de comando, em alinhamento com a filosofia de UX e clareza do projeto.
 
 ## 2. Novos Tipos de Agrupamento
 
-### 2.1. `Optional` (Múltiplos Opcionais)
-- **Descrição:** Nenhuma opção do grupo é obrigatória. Se o usuário fornecer opções, pode fornecer quantas quiser (0, 1, ou N).
-- **Regra de Validação:** Nenhuma validação de quantidade mínima ou máxima. Apenas agrupa semanticamente ou para fins de documentação/futuro uso.
+### 2.1. `None` (Múltiplos Opcionais)
+- **Descrição:** Nenhuma opção do grupo é obrigatória. O usuário pode fornecer quantas quiser (0, 1, ou N).
 - **Caso de Uso:** Flags de configuração avançada que são todas opcionais e independentes, mas pertencem a uma categoria lógica (ex: "LogSettings").
 
-### 2.2. `OptionalAtMostOne` (Opcional, Máximo 1)
+### 2.2. `AtMostOne` (Opcional, Máximo 1)
 - **Descrição:** Nenhuma opção do grupo é obrigatória. Porém, se o usuário fornecer, só pode fornecer no máximo uma.
-- **Regra de Validação:** `Count <= 1`. (0 é válido, 1 é válido, >1 é erro).
 - **Caso de Uso:** Seleção de modo de operação onde existe um padrão (nenhuma flag) ou uma sobreposição específica mutuamente exclusiva, mas opcional.
 
 ## 3. Impacto na Arquitetura
 
-### 3.1. API Pública (`CleanConsole.Parse.Enums`)
-- **Arquivo:** `OptionGroupType.cs`
-- **Alteração:** Adição de dois novos membros ao enum.
+- **Enum:** `CleanConsole.Parse.Enums.OptionGroupRequirement.cs` - Adicionar novos membros.
+- **Parser:** `CleanConsole.Parse.CleanParser.cs` - Adicionar lógica de validação.
+- **Testes:** `CleanConsole.Parse.Tests.GroupTests.cs` - Adicionar novos casos de teste.
 
-```csharp
-public enum OptionGroupType
-{
-    ExactOne,
-    AtLeastOne,
-    Optional,        // Novo
-    OptionalAtMostOne // Novo
-}
-```
+## 4. Plano de Execução Detalhado
 
-### 3.2. Lógica de Validação (`CleanConsole.Parse`)
-- **Arquivo:** `CleanParser.cs`
-- **Local:** Método `Parse<T>`, bloco "6. Validação de Regras de Negócio (Grupos)".
-- **Alteração:** Adicionar os `else if` ou `switch` para tratar os novos tipos.
+O plano de tarefas foi completamente reestruturado em Épicos para refletir uma sequência de trabalho mais clara, da arquitetura à entrega final.
 
-## 4. Estratégia de Testes (`CleanConsole.Parse.Tests`)
-Novos testes devem ser adicionados em `GroupTests.cs` para cobrir os novos cenários.
-
-### Casos de Teste - `Optional`
-1. **Sucesso:** Nenhuma opção fornecida (Count = 0).
-2. **Sucesso:** Uma opção fornecida (Count = 1).
-3. **Sucesso:** Múltiplas opções fornecidas (Count > 1).
-
-### Casos de Teste - `OptionalAtMostOne`
-1. **Sucesso:** Nenhuma opção fornecida (Count = 0).
-2. **Sucesso:** Uma opção fornecida (Count = 1).
-3. **Falha:** Duas opções fornecidas (Count = 2) -> Deve lançar `CleanParserException`.
-
-## 5. Plano de Tarefas
+#### **Épico 1: Refatoração da Arquitetura e API**
+*Objetivo: Modernizar a API e a estrutura do projeto antes de adicionar novos recursos.*
 
 | ID | Tarefa | Responsável | Status |
-|----|--------|-------------|--------|
-| T-01 | Atualizar `OptionGroupType` com `Optional` e `OptionalAtMostOne`. | Architect | Pendente |
-| T-02 | Implementar lógica de validação para `Optional` em `CleanParser.cs`. | Core Eng | Pendente |
-| T-03 | Implementar lógica de validação para `OptionalAtMostOne` em `CleanParser.cs`. | Core Eng | Pendente |
-| T-04 | Criar testes unitários para o grupo `Optional`. | QA Eng | Pendente |
-| T-05 | Criar testes unitários para o grupo `OptionalAtMostOne`. | QA Eng | Pendente |
-| T-06 | Verificar se a documentação de ajuda (`GetHelpText`) reflete corretamente os grupos. | Architect | Pendente |
-| T-07 | Melhorar `GetHelpText` para exibir o *tipo* de restrição do grupo (ex: `(Max 1)`, `(Optional)`). | Core Eng | Pendente |
-| T-08 | Atualizar `docs/API_REFERENCE.md` com os novos tipos de agrupamento e exemplos. | Architect | Pendente |
+|:---|:---|:---|:---|
+| R-01 | Unificar todos os namespaces para `CleanConsole.Parse`. | Architect | Concluído |
+| R-02 | Renomear atributo `ProgramDef` para `ProgramDefinition` e seu arquivo. | Architect | Concluído |
+| R-03 | No atributo `[OptionGroup]`, renomear a propriedade `Type` para `Require`. | Architect | Pendente |
+| R-04 | Adicionar a propriedade `string Description` ao `[OptionAttribute]`. | Architect | Pendente |
+| R-05 | Adicionar a propriedade `string Description` ao `[OptionGroupAttribute]`. | Architect | Pendente |
+| R-06 | **(Cancelado)** Mover `OptionGroupRequirement.cs` da pasta `Enums` para a raiz. | Architect | Cancelado |
+
+#### **Épico 2: Implementação dos Novos Tipos de Grupo**
+*Objetivo: Implementar a lógica central para os requisitos de grupo `None` e `AtMostOne`.*
+
+| ID | Tarefa | Responsável | Status |
+|:---|:---|:---|:---|
+| F-01 | Atualizar o enum `OptionGroupRequirement` com os valores `None` e `AtMostOne`. | Core Eng | Pendente |
+| F-02 | Implementar a lógica de validação para `None` no `CleanParser`. | Core Eng | Pendente |
+| F-03 | Implementar a lógica de validação para `AtMostOne` no `CleanParser`. | Core Eng | Pendente |
+
+#### **Épico 3: Experiência do Usuário (UX) e Geração de Ajuda**
+*Objetivo: Garantir que a saída do console (ajuda e erros) seja clara e informativa.*
+
+| ID | Tarefa | Responsável | Status |
+|:---|:---|:---|:---|
+| UX-01 | Desenhar o formato de exibição do texto de ajuda (`--help`) para os grupos, incluindo suas `Description` e requisito (`None`, `AtMostOne`, etc.). | UX Specialist | Pendente |
+| UX-02 | Desenhar a mensagem de erro específica para a violação da regra `AtMostOne`. | UX Specialist | Pendente |
+| UX-03 | Implementar a nova geração de `GetHelpText` para refletir o design da tarefa UX-01. | Core Eng | Pendente |
+
+#### **Épico 4: Testes e Garantia de Qualidade (QA)**
+*Objetivo: Assegurar que as novas funcionalidades e refatorações sejam robustas e não introduzam regressões.*
+
+| ID | Tarefa | Responsável | Status |
+|:---|:---|:---|:---|
+| T-01 | Criar testes unitários para o requisito de grupo `None`. | QA Eng | Pendente |
+| T-02 | Criar testes unitários para o requisito de grupo `AtMostOne` (sucesso e falha). | QA Eng | Pendente |
+| T-03 | Criar teste unitário que valide a nova mensagem de erro da tarefa UX-02. | QA Eng | Pendente |
+| T-04 | Criar testes para verificar se a `Description` de `[Option]` e `[OptionGroup]` aparece no `GetHelpText`. | QA Eng | Pendente |
+| T-05 | Criar testes para as refatorações de nomenclatura (`ProgramDefinition`, `Require`). | QA Eng | Pendente |
+
+#### **Épico 5: Documentação e Finalização**
+*Objetivo: Realizar a revisão final e atualizar toda a documentação do projeto para refletir as mudanças.*
+
+| ID | Tarefa | Responsável | Status |
+|:---|:---|:---|:---|
+| D-01 | Realizar a Revisão de Código (Code Review) de todas as implementações. | Architect | Pendente |
+| D-02 | Atualizar `docs/API_REFERENCE.md` com todas as mudanças na API (atributos, propriedades e enums). | Architect | Pendente |
+| D-03 | Atualizar `README.md` com exemplos das novas funcionalidades. | Architect | Pendente |
+| D-04 | Atualizar `PRD.md` para refletir a nova arquitetura de namespace único e as novas funcionalidades. | Architect | Pendente |
+| D-05 | Adicionar exemplos de uso dos novos tipos de grupo em `docs/BEST_PRACTICES.md` ou `GETTING_STARTED.md`. | Architect | Pendente |
+| D-06 | Revisar e atualizar os arquivos em `agents/` se a refatoração da API impactar as responsabilidades. | Architect | Pendente |
 
 ---
 *Aprovado por:* Solutions Architect
+---

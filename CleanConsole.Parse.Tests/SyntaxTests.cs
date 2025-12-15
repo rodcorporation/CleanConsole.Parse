@@ -1,13 +1,11 @@
 using Xunit;
 using CleanConsole.Parse;
-using CleanConsole.Parse.Attributes;
-using CleanConsole.Parse.Exceptions;
 
 namespace CleanConsole.Parse.Tests;
 
 public class SyntaxTests
 {
-    [ProgramDef(Name = "Test", Description = "Test")]
+    [ProgramDefinition(Name = "Test", Description = "Test")]
     public class SimpleConfig
     {
         [Option("port")]

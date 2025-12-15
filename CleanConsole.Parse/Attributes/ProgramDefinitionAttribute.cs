@@ -1,13 +1,13 @@
 using System;
 
-namespace CleanConsole.Parse.Attributes;
+namespace CleanConsole.Parse;
 
 /// <summary>
 /// Defines metadata for the CLI application.
 /// Must be applied to the class that holds the arguments.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
-public sealed class ProgramDefAttribute : Attribute
+public sealed class ProgramDefinitionAttribute : Attribute
 {
     /// <summary>
     /// The name of the application program.
