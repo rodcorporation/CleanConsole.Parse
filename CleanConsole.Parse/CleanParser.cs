@@ -192,6 +192,7 @@ public static class CleanParser
     {
         var type = typeof(T);
         var programDef = type.GetCustomAttribute<ProgramDefinitionAttribute>();
+        var definedGroups = type.GetCustomAttributes<OptionGroupAttribute>().ToDictionary(g => g.Name);
         var sb = new StringBuilder();
 
         if (programDef != null)
@@ -205,32 +206,73 @@ public static class CleanParser
             sb.AppendLine();
         }
 
-        sb.AppendLine("Options:");
-
         var properties = type.GetProperties();
+        
+        var ungroupedOptions = new List<PropertyInfo>();
+        var groupedOptions = new Dictionary<string, List<PropertyInfo>>();
+
         foreach (var prop in properties)
         {
             var opt = prop.GetCustomAttribute<OptionAttribute>();
             if (opt == null) continue;
 
-            var shortName = !string.IsNullOrEmpty(opt.ShortOptionName) ? $"-{opt.ShortOptionName}, " : "    ";
-            var longName = $"--{opt.OptionName}";
-            
-            var line = $"  {shortName}{longName}";
-            
-            // Padding para alinhar
-            if (line.Length < 30)
-                line = line.PadRight(30);
-            
-            if (!string.IsNullOrEmpty(opt.Group))
+            if (!string.IsNullOrEmpty(opt.Group) && definedGroups.ContainsKey(opt.Group))
             {
-                line += $" [Group: {opt.Group}]";
+                if (!groupedOptions.ContainsKey(opt.Group))
+                    groupedOptions[opt.Group] = new List<PropertyInfo>();
+                
+                groupedOptions[opt.Group].Add(prop);
             }
-
-            sb.AppendLine(line);
+            else
+            {
+                ungroupedOptions.Add(prop);
+            }
         }
 
-        return sb.ToString();
+        if (ungroupedOptions.Any())
+        {
+            sb.AppendLine("Options:");
+            foreach (var prop in ungroupedOptions)
+            {
+                sb.AppendLine(FormatOptionLine(prop));
+            }
+            sb.AppendLine();
+        }
+
+        foreach (var groupName in groupedOptions.Keys)
+        {
+            var groupAttr = definedGroups[groupName];
+            var groupDesc = !string.IsNullOrEmpty(groupAttr.Description) ? $" - {groupAttr.Description}" : "";
+            sb.AppendLine($"Group: {groupName} (Requirement: {groupAttr.Require}){groupDesc}");
+            
+            foreach (var prop in groupedOptions[groupName])
+            {
+                sb.AppendLine(FormatOptionLine(prop));
+            }
+            sb.AppendLine();
+        }
+
+        return sb.ToString().TrimEnd();
+    }
+
+    private static string FormatOptionLine(PropertyInfo prop)
+    {
+        var opt = prop.GetCustomAttribute<OptionAttribute>();
+        var shortName = !string.IsNullOrEmpty(opt!.ShortOptionName) ? $"-{opt.ShortOptionName}, " : "    ";
+        var longName = $"--{opt.OptionName}";
+        
+        var line = $"  {shortName}{longName}";
+        
+        // Padding para alinhar
+        if (line.Length < 30)
+            line = line.PadRight(30);
+        
+        if (!string.IsNullOrEmpty(opt.Description))
+        {
+            line += $"{opt.Description}";
+        }
+
+        return line;
     }
 
     private static void PrintSummary<T>(T instance, PropertyInfo[] properties)

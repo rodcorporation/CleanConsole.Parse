@@ -47,13 +47,13 @@ using CleanConsole.Parse;
 [ProgramDefinition(Name = "FileCompressor", Description = "Ferramenta CLI para compressão de arquivos.")]
 public class CompressionOptions
 {
-    [Option(OptionName = "input", ShortOptionName = "i")]
+    [Option("input", ShortOptionName = "i", Description = "Caminho do arquivo de entrada")]
     public string InputFile { get; set; }
 
-    [Option(OptionName = "level")]
+    [Option("level", Description = "Nível de compressão (1-9)")]
     public int CompressionLevel { get; set; } = 5; // Valor padrão
 
-    [Option(OptionName = "verbose", ShortOptionName = "v")]
+    [Option("verbose", ShortOptionName = "v", Description = "Habilita logs detalhados")]
     public bool Verbose { get; set; }
 }
 ```
