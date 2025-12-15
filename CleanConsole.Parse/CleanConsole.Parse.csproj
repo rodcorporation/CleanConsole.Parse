@@ -8,12 +8,12 @@
     <!-- NuGet Metadata -->
     <PackageId>CleanConsole.Parse</PackageId>
     <Title>CleanConsole.Parse</Title>
-    <Authors>CleanConsole Contributors</Authors>
+    <Authors>Rodrigo Leme</Authors>
     <Description>A clean, declarative, and robust command-line argument parser for .NET 10. Eliminate boilerplate code with attribute-based configuration.</Description>
     <PackageTags>cli;parser;console;arguments;command-line;dotnet;attributes;clean-code</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/YOUR_USER/CleanConsole.Parse</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/YOUR_USER/CleanConsole.Parse</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/rodcorporation/CleanConsole.Parse</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     
