@@ -1,6 +1,6 @@
 using System;
 
-namespace CleanConsole.Parse.Attributes;
+namespace CleanConsole.Parse;
 
 /// <summary>
 /// Marks a property as a command-line option.

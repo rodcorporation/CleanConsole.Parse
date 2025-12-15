@@ -1,6 +1,6 @@
 using System;
 
-namespace CleanConsole.Parse.Attributes;
+namespace CleanConsole.Parse;
 
 /// <summary>
 /// Defines metadata for the CLI application.

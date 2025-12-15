@@ -1,6 +1,6 @@
 using System;
 
-namespace CleanConsole.Parse.Exceptions;
+namespace CleanConsole.Parse;
 
 /// <summary>
 /// Represents errors that occur during argument parsing or configuration validation.

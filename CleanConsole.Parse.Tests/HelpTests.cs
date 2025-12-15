@@ -1,6 +1,5 @@
 using Xunit;
 using CleanConsole.Parse;
-using CleanConsole.Parse.Attributes;
 
 namespace CleanConsole.Parse.Tests;
 

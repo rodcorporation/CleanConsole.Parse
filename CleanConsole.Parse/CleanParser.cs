@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using CleanConsole.Parse.Attributes;
-using CleanConsole.Parse.Exceptions;
 
 namespace CleanConsole.Parse;
 
@@ -145,14 +143,14 @@ public static class CleanParser
         foreach (var group in definedGroups)
         {
             int count = groupCounts[group.Name];
-            if (group.Type == Enums.OptionGroupType.ExactOne)
+            if (group.Type == OptionGroupRequirement.ExactOne)
             {
                 if (count != 1)
                 {
                     throw new CleanParserException($"Conflito de opções: O grupo '{group.Name}' exige exatamente uma opção, mas foram fornecidas: {count}.");
                 }
             }
-            else if (group.Type == Enums.OptionGroupType.AtLeastOne)
+            else if (group.Type == OptionGroupRequirement.AtLeastOne)
             {
                 if (count == 0)
                 {
