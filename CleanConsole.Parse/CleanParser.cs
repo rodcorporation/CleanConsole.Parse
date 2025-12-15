@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.IO;
 
 namespace CleanConsole.Parse;
 
@@ -18,6 +19,30 @@ public static class CleanParser
         typeof(double),
         typeof(bool)
     };
+
+    private static Func<string[]> _commandLineArgsProvider = () => Environment.GetCommandLineArgs();
+
+    internal static Func<string[]> CommandLineArgsProvider
+    {
+        get => _commandLineArgsProvider;
+        set => _commandLineArgsProvider = value ?? throw new ArgumentNullException(nameof(value));
+    }
+
+    /// <summary>
+    /// Parses the current process command line arguments into an instance of type T.
+    /// </summary>
+    /// <typeparam name="T">The type to parse into. Must be a class with a parameterless constructor.</typeparam>
+    /// <returns>A populated instance of T.</returns>
+    /// <exception cref="CleanParserException">Thrown when configuration is invalid or parsing fails.</exception>
+    public static T Parse<T>() where T : class, new()
+    {
+        var args = CommandLineArgsProvider.Invoke() ?? Array.Empty<string>();
+        var effectiveArgs = args.Length > 0 && Path.IsPathRooted(args[0])
+            ? args.Skip(1).ToArray()
+            : args;
+
+        return Parse<T>(effectiveArgs);
+    }
 
     /// <summary>
     /// Parses the command line arguments into an instance of type T.

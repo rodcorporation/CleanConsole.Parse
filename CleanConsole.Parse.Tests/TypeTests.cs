@@ -91,4 +91,24 @@ public class TypeTests
         var res = CleanParser.Parse<TypeConfig>(new[] { "-int:10", "-int:20" });
         Assert.Equal(20, res.IntVal);
     }
+
+    [Fact]
+    public void Should_Parse_Using_CommandLineArgs_When_Not_Passed_Explicitly()
+    {
+        var originalProvider = CleanParser.CommandLineArgsProvider;
+
+        try
+        {
+            CleanParser.CommandLineArgsProvider = () => new[] { "/app/testhost.dll", "-int=42", "-bool" };
+
+            var result = CleanParser.Parse<TypeConfig>();
+
+            Assert.Equal(42, result.IntVal);
+            Assert.True(result.BoolVal);
+        }
+        finally
+        {
+            CleanParser.CommandLineArgsProvider = originalProvider;
+        }
+    }
 }
