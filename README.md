@@ -107,6 +107,24 @@ public class LoginOptions
 // O parser lançará erro se o usuário fornecer ambos ou nenhum!
 ```
 
+Também é possível exigir que todas as opções de um conjunto sejam fornecidas usando `OptionGroupRequirement.All`.
+
+```csharp
+[OptionGroup("Sync", OptionGroupRequirement.All)]
+public class SyncOptions
+{
+    [Option(OptionName = "source", Group = "Sync")]
+    public string Source { get; set; }
+
+    [Option(OptionName = "target", Group = "Sync")]
+    public string Target { get; set; }
+
+    [Option(OptionName = "audit", Group = "Sync")]
+    public bool Audit { get; set; }
+}
+// Faltou um dos argumentos? O erro listará exatamente qual faltou.
+```
+
 ---
 
 ## 📚 Documentação Completa

@@ -40,7 +40,7 @@ O construtor aceita o nome do grupo e seu requisito de validação.
 | Parâmetro | Tipo | Obrigatório | Descrição |
 | :--- | :--- | :--- | :--- |
 | `name` | `string` | Sim | Identificador único do grupo (referenciado em `[Option]`). |
-| `require` | `OptionGroupRequirement` | Sim | A regra de validação a ser aplicada (`ExactOne`, `AtLeastOne`, `None`, ou `AtMostOne`). |
+| `require` | `OptionGroupRequirement` | Sim | A regra de validação a ser aplicada (`ExactOne`, `AtLeastOne`, `None`, `AtMostOne` ou `All`). |
 | `Description` | `string` | Não | Descrição do grupo para exibição na ajuda. |
 
 ## Enums
@@ -52,6 +52,7 @@ Define o comportamento de validação de um grupo.
 *   **`AtLeastOne`**: Pelo menos uma opção deve ser fornecida. Erro se 0.
 *   **`None`**: Nenhuma opção do grupo é obrigatória. Qualquer número de opções (0 a N) pode ser fornecido.
 *   **`AtMostOne`**: Nenhuma opção do grupo é obrigatória, mas no máximo uma pode ser fornecida. Erro se >1.
+*   **`All`**: Todas as opções do grupo devem ser fornecidas. Erro se qualquer membro estiver ausente.
 
 ## Exceções
 

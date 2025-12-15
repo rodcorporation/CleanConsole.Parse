@@ -37,7 +37,7 @@ Responsável por transformar strings brutas em dados estruturados.
 
 ### 3. Sistema de Validação
 *   **Type Safety:** Garante que "123" vire `int` e "true" vire `bool`.
-*   **Logic Validation:** Verifica as regras de `ExactOne` ou `AtLeastOne` após o binding.
+*   **Logic Validation:** Verifica as regras definidas pelos grupos (`ExactOne`, `AtLeastOne`, `AtMostOne`, `All`, etc.) após o binding.
 
 ## Decisões de Design
 

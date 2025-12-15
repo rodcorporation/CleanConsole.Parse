@@ -59,6 +59,41 @@ catch (CleanParserException ex)
 }
 ```
 
+## Exemplo: Grupos com Regra `All`
+
+Quando um conjunto de argumentos só faz sentido completo (por exemplo, caminho + tentativas + modo verboso habilitado juntos), utilize `OptionGroupRequirement.All`. Todas as opções marcadas com o mesmo grupo precisam aparecer na linha de comando; o parser indicará quais ficaram faltando.
+
+```csharp
+[ProgramDefinition(Name = "SyncTool", Description = "Sincronizador de diretórios.")]
+[OptionGroup("SyncConfig", OptionGroupRequirement.All, Description = "Parâmetros obrigatórios da sincronização")]
+[OptionGroup("Mode", OptionGroupRequirement.AtLeastOne, Description = "Escolha pelo menos um modo")]
+public class SyncOptions
+{
+    [Option("source", Group = "SyncConfig", Description = "Pasta de origem")]
+    public string Source { get; set; } = string.Empty;
+
+    [Option("target", Group = "SyncConfig", Description = "Pasta de destino")]
+    public string Target { get; set; } = string.Empty;
+
+    [Option("audit", Group = "SyncConfig", Description = "Habilita auditoria detalhada")]
+    public bool Audit { get; set; }
+
+    [Option("mirror", Group = "Mode", Description = "Espelha destino com base na origem")]
+    public bool Mirror { get; set; }
+
+    [Option("backup", Group = "Mode", Description = "Gera cópia incremental")]
+    public bool Backup { get; set; }
+}
+```
+
+Uso típico:
+
+```bash
+sync.exe --source:"c:/dados" --target:"d:/mirror" --audit --mirror
+```
+
+Se qualquer opção do grupo `SyncConfig` estiver ausente, o `CleanParser` lançará uma `CleanParserException` indicando exatamente quais argumentos faltaram (ex.: `--source`, `--target`).
+
 ## Formatos de Comando Suportados
 
 A biblioteca é flexível e aceita:
