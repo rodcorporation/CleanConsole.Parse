@@ -143,19 +143,33 @@ public static class CleanParser
         foreach (var group in definedGroups)
         {
             int count = groupCounts[group.Name];
-            if (group.Type == OptionGroupRequirement.ExactOne)
+
+            switch (group.Require)
             {
-                if (count != 1)
-                {
-                    throw new CleanParserException($"Conflito de opções: O grupo '{group.Name}' exige exatamente uma opção, mas foram fornecidas: {count}.");
-                }
-            }
-            else if (group.Type == OptionGroupRequirement.AtLeastOne)
-            {
-                if (count == 0)
-                {
-                    throw new CleanParserException($"Requisito não atendido: Pelo menos uma opção do grupo '{group.Name}' deve ser fornecida.");
-                }
+                case OptionGroupRequirement.ExactOne:
+                    if (count != 1)
+                    {
+                        throw new CleanParserException($"Conflito de opções: O grupo '{group.Name}' exige exatamente uma opção, mas foram fornecidas: {count}.");
+                    }
+                    break;
+
+                case OptionGroupRequirement.AtLeastOne:
+                    if (count == 0)
+                    {
+                        throw new CleanParserException($"Requisito não atendido: Pelo menos uma opção do grupo '{group.Name}' deve ser fornecida.");
+                    }
+                    break;
+
+                case OptionGroupRequirement.AtMostOne:
+                    if (count > 1)
+                    {
+                        throw new CleanParserException($"Conflito de opções: O grupo '{group.Name}' permite no máximo uma opção, mas foram fornecidas: {count}.");
+                    }
+                    break;
+
+                case OptionGroupRequirement.None:
+                default:
+                    break;
             }
         }
 
