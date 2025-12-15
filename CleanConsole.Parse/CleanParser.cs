@@ -59,145 +59,182 @@ public static class CleanParser
 
         ValidateConfiguration(metadata);
 
-        var tokens = Tokenize(args);
+        var helpRequested = TryFilterHelpTokens(args, out var filteredArgs);
+        var helpPayload = helpRequested ? BuildHelpPayload(metadata) : null;
+
+        List<(string Key, string? Value)> tokens;
+        try
+        {
+            tokens = Tokenize(filteredArgs);
+        }
+        catch (CleanParserException) when (helpRequested)
+        {
+            return ParseResultFactory.Help(new T(), helpPayload ?? BuildHelpPayload(metadata));
+        }
+
         var instance = new T();
 
-        // Rastreamento para validação de grupos
         var groupCounts = metadata.Groups.ToDictionary(g => g.Key, _ => 0);
         var groupMissingOptions = metadata.Groups.ToDictionary(
             g => g.Key,
             g => new HashSet<OptionDescriptor>(g.Value.Options));
 
-        foreach (var option in metadata.Options)
+        try
         {
-            var optionAttr = option.Attribute;
-
-            var match = tokens.LastOrDefault(t =>
-                string.Equals(t.Key, optionAttr.OptionName, StringComparison.OrdinalIgnoreCase) ||
-                (!string.IsNullOrEmpty(optionAttr.ShortOptionName) && string.Equals(t.Key, optionAttr.ShortOptionName, StringComparison.OrdinalIgnoreCase))
-            );
-
-            if (match.Key == null) continue;
-
-            if (!string.IsNullOrEmpty(optionAttr.Group) && groupCounts.ContainsKey(optionAttr.Group))
+            foreach (var option in metadata.Options)
             {
-                groupCounts[optionAttr.Group]++;
-                if (groupMissingOptions.TryGetValue(optionAttr.Group, out var missingSet))
-                {
-                    missingSet.Remove(option);
-                }
-            }
+                var optionAttr = option.Attribute;
 
-            if (option.Property.PropertyType == typeof(bool))
-            {
-                if (match.Value == null)
+                var match = tokens.LastOrDefault(t =>
+                    string.Equals(t.Key, optionAttr.OptionName, StringComparison.OrdinalIgnoreCase) ||
+                    (!string.IsNullOrEmpty(optionAttr.ShortOptionName) && string.Equals(t.Key, optionAttr.ShortOptionName, StringComparison.OrdinalIgnoreCase))
+                );
+
+                if (match.Key == null) continue;
+
+                if (!string.IsNullOrEmpty(optionAttr.Group) && groupCounts.ContainsKey(optionAttr.Group))
                 {
-                    option.Property.SetValue(instance, true);
-                }
-                else
-                {
-                    if (bool.TryParse(match.Value, out bool boolResult))
+                    groupCounts[optionAttr.Group]++;
+                    if (groupMissingOptions.TryGetValue(optionAttr.Group, out var missingSet))
                     {
-                        option.Property.SetValue(instance, boolResult);
+                        missingSet.Remove(option);
+                    }
+                }
+
+                if (option.Property.PropertyType == typeof(bool))
+                {
+                    if (match.Value == null)
+                    {
+                        option.Property.SetValue(instance, true);
                     }
                     else
                     {
-                        throw new CleanParserException($"O valor '{match.Value}' não é válido para o argumento '{optionAttr.OptionName}'. Esperava-se um 'Boolean'.");
+                        if (bool.TryParse(match.Value, out bool boolResult))
+                        {
+                            option.Property.SetValue(instance, boolResult);
+                        }
+                        else if (!helpRequested)
+                        {
+                            throw new CleanParserException($"O valor '{match.Value}' não é válido para o argumento '{optionAttr.OptionName}'. Esperava-se um 'Boolean'.");
+                        }
+                    }
+                }
+                else
+                {
+                    if (match.Value == null)
+                    {
+                        if (helpRequested)
+                        {
+                            continue;
+                        }
+
+                        throw new CleanParserException($"O argumento '{match.Key}' exige um valor, mas nenhum foi fornecido.");
+                    }
+
+                    try
+                    {
+                        object? convertedValue = null;
+
+                        if (option.Property.PropertyType == typeof(string))
+                        {
+                            convertedValue = match.Value;
+                        }
+                        else if (option.Property.PropertyType == typeof(int))
+                        {
+                            if (int.TryParse(match.Value, out int intResult))
+                            {
+                                convertedValue = intResult;
+                            }
+                            else if (!helpRequested)
+                            {
+                                throw new CleanParserException($"O valor '{match.Value}' não é válido para o argumento '{optionAttr.OptionName}'. Esperava-se um 'Int32'.");
+                            }
+                        }
+                        else if (option.Property.PropertyType == typeof(double))
+                        {
+                            if (double.TryParse(match.Value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double doubleResult))
+                            {
+                                convertedValue = doubleResult;
+                            }
+                            else if (!helpRequested)
+                            {
+                                throw new CleanParserException($"O valor '{match.Value}' não é válido para o argumento '{optionAttr.OptionName}'. Esperava-se um 'Double'.");
+                            }
+                        }
+
+                        if (convertedValue != null || option.Property.PropertyType == typeof(string))
+                        {
+                            option.Property.SetValue(instance, convertedValue);
+                        }
+                    }
+                    catch (Exception ex) when (ex is not CleanParserException)
+                    {
+                        if (helpRequested)
+                        {
+                            continue;
+                        }
+
+                        throw new CleanParserException($"Erro ao definir valor para '{optionAttr.OptionName}': {ex.Message}", ex);
                     }
                 }
             }
-            else
+
+            if (!helpRequested)
             {
-                if (match.Value == null)
+                foreach (var groupEntry in metadata.Groups)
                 {
-                    throw new CleanParserException($"O argumento '{match.Key}' exige um valor, mas nenhum foi fornecido.");
-                }
+                    var groupAttr = groupEntry.Value.Attribute;
+                    int count = groupCounts[groupAttr.Name];
 
-                try
-                {
-                    object? convertedValue = null;
+                    switch (groupAttr.Require)
+                    {
+                        case OptionGroupRequirement.ExactOne:
+                            if (count != 1)
+                            {
+                                throw new CleanParserException($"Conflito de opções: O grupo '{groupAttr.Name}' exige exatamente uma opção, mas foram fornecidas: {count}.");
+                            }
+                            break;
 
-                    if (option.Property.PropertyType == typeof(string))
-                    {
-                        convertedValue = match.Value;
-                    }
-                    else if (option.Property.PropertyType == typeof(int))
-                    {
-                        if (int.TryParse(match.Value, out int intResult))
-                        {
-                            convertedValue = intResult;
-                        }
-                        else
-                        {
-                            throw new CleanParserException($"O valor '{match.Value}' não é válido para o argumento '{optionAttr.OptionName}'. Esperava-se um 'Int32'.");
-                        }
-                    }
-                    else if (option.Property.PropertyType == typeof(double))
-                    {
-                        if (double.TryParse(match.Value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double doubleResult))
-                        {
-                            convertedValue = doubleResult;
-                        }
-                        else
-                        {
-                            throw new CleanParserException($"O valor '{match.Value}' não é válido para o argumento '{optionAttr.OptionName}'. Esperava-se um 'Double'.");
-                        }
-                    }
+                        case OptionGroupRequirement.AtLeastOne:
+                            if (count == 0)
+                            {
+                                throw new CleanParserException($"Requisito não atendido: Pelo menos uma opção do grupo '{groupAttr.Name}' deve ser fornecida.");
+                            }
+                            break;
 
-                    option.Property.SetValue(instance, convertedValue);
-                }
-                catch (Exception ex) when (ex is not CleanParserException)
-                {
-                    throw new CleanParserException($"Erro ao definir valor para '{optionAttr.OptionName}': {ex.Message}", ex);
+                        case OptionGroupRequirement.AtMostOne:
+                            if (count > 1)
+                            {
+                                throw new CleanParserException($"Conflito de opções: O grupo '{groupAttr.Name}' permite no máximo uma opção, mas foram fornecidas: {count}.");
+                            }
+                            break;
+
+                        case OptionGroupRequirement.All:
+                            var missing = groupMissingOptions[groupAttr.Name];
+                            if (missing.Count > 0)
+                            {
+                                var missingList = string.Join(", ", missing.Select(o => $"--{o.Attribute.OptionName}"));
+                                throw new CleanParserException($"Requisito não atendido: Todas as opções do grupo '{groupAttr.Name}' devem ser fornecidas. Ausentes: {missingList}.");
+                            }
+                            break;
+
+                        case OptionGroupRequirement.None:
+                        default:
+                            break;
+                    }
                 }
             }
         }
-
-        // 6. Validação de Regras de Negócio (Grupos)
-        foreach (var groupEntry in metadata.Groups)
+        catch (CleanParserException) when (helpRequested)
         {
-            var groupAttr = groupEntry.Value.Attribute;
-            int count = groupCounts[groupAttr.Name];
-
-            switch (groupAttr.Require)
-            {
-                case OptionGroupRequirement.ExactOne:
-                    if (count != 1)
-                    {
-                        throw new CleanParserException($"Conflito de opções: O grupo '{groupAttr.Name}' exige exatamente uma opção, mas foram fornecidas: {count}.");
-                    }
-                    break;
-
-                case OptionGroupRequirement.AtLeastOne:
-                    if (count == 0)
-                    {
-                        throw new CleanParserException($"Requisito não atendido: Pelo menos uma opção do grupo '{groupAttr.Name}' deve ser fornecida.");
-                    }
-                    break;
-
-                case OptionGroupRequirement.AtMostOne:
-                    if (count > 1)
-                    {
-                        throw new CleanParserException($"Conflito de opções: O grupo '{groupAttr.Name}' permite no máximo uma opção, mas foram fornecidas: {count}.");
-                    }
-                    break;
-
-                case OptionGroupRequirement.All:
-                    var missing = groupMissingOptions[groupAttr.Name];
-                    if (missing.Count > 0)
-                    {
-                        var missingList = string.Join(", ", missing.Select(o => $"--{o.Attribute.OptionName}"));
-                        throw new CleanParserException($"Requisito não atendido: Todas as opções do grupo '{groupAttr.Name}' devem ser fornecidas. Ausentes: {missingList}.");
-                    }
-                    break;
-
-                case OptionGroupRequirement.None:
-                default:
-                    break;
-            }
+            return ParseResultFactory.Help(instance, helpPayload ?? BuildHelpPayload(metadata));
         }
 
-        // 7.3 Implementar PrintSummary
+        if (helpRequested)
+        {
+            return ParseResultFactory.Help(instance, helpPayload ?? BuildHelpPayload(metadata));
+        }
+
         var programDef = type.GetCustomAttribute<ProgramDefinitionAttribute>();
         if (programDef != null && programDef.PrintSummary)
         {
@@ -294,6 +331,94 @@ public static class CleanParser
         }
 
         return line;
+    }
+
+    private static bool TryFilterHelpTokens(string[] args, out string[] filteredArgs)
+    {
+        if (args == null || args.Length == 0)
+        {
+            filteredArgs = Array.Empty<string>();
+            return false;
+        }
+
+        var list = new List<string>(args.Length);
+        var helpRequested = false;
+
+        foreach (var arg in args)
+        {
+            if (IsHelpToken(arg))
+            {
+                helpRequested = true;
+                continue;
+            }
+
+            list.Add(arg);
+        }
+
+        filteredArgs = helpRequested ? list.ToArray() : args;
+        return helpRequested;
+    }
+
+    private static bool IsHelpToken(string arg)
+    {
+        if (string.IsNullOrWhiteSpace(arg))
+        {
+            return false;
+        }
+
+        if (!arg.StartsWith("-") && !arg.StartsWith("/"))
+        {
+            return false;
+        }
+
+        var cleanArg = arg;
+
+        if (cleanArg.StartsWith("--"))
+        {
+            cleanArg = cleanArg.Substring(2);
+        }
+        else
+        {
+            cleanArg = cleanArg.Substring(1);
+        }
+
+        int separatorIndex = cleanArg.IndexOfAny(new[] { ':', '=' });
+        if (separatorIndex >= 0)
+        {
+            cleanArg = cleanArg.Substring(0, separatorIndex);
+        }
+
+        return string.Equals(cleanArg, "help", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(cleanArg, "h", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(cleanArg, "?", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static ParseHelpPayload BuildHelpPayload(OptionMetadata metadata)
+    {
+        var programDef = metadata.Type.GetCustomAttribute<ProgramDefinitionAttribute>();
+        var title = string.IsNullOrWhiteSpace(programDef?.Name) ? metadata.Type.Name : programDef!.Name;
+        var description = string.IsNullOrWhiteSpace(programDef?.Description) ? null : programDef!.Description;
+        var usageSource = string.IsNullOrWhiteSpace(programDef?.Name) ? metadata.Type.Name : programDef!.Name;
+        var usage = $"{usageSource} [options]";
+
+        var options = metadata.Options
+            .Select(option => new ParseHelpOption(
+                option.Attribute.OptionName,
+                option.Attribute.ShortOptionName,
+                option.Attribute.Description,
+                option.Attribute.Group,
+                option.Property.PropertyType != typeof(bool)))
+            .ToList();
+
+        var groups = metadata.Groups.Values
+            .Select(group => new ParseHelpGroup(
+                group.Attribute.Name,
+                group.Attribute.Require,
+                group.Attribute.Description,
+                group.Options.Select(opt => opt.Attribute.OptionName).ToList()))
+            .ToList();
+
+        return new ParseHelpPayload(title, description, usage, options, groups, Array.Empty<string>());
     }
 
     private static void PrintSummary<T>(T instance, IReadOnlyList<OptionDescriptor> options)
