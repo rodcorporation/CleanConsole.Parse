@@ -54,58 +54,44 @@ public static class CleanParser
     /// <exception cref="CleanParserException">Thrown when configuration is invalid or parsing fails.</exception>
     public static T Parse<T>(string[] args) where T : class, new()
     {
-        ValidateConfiguration<T>();
+        var type = typeof(T);
+        var metadata = BuildOptionMetadata(type);
+
+        ValidateConfiguration(metadata);
 
         var tokens = Tokenize(args);
         var instance = new T();
-        var type = typeof(T);
-        var properties = type.GetProperties();
-        var definedGroups = type.GetCustomAttributes<OptionGroupAttribute>().ToList();
-        
+
         // Rastreamento para validação de grupos
-        // Key: GroupName, Value: Count of options set
-        var groupCounts = definedGroups.ToDictionary(g => g.Name, g => 0);
+        var groupCounts = metadata.Groups.ToDictionary(g => g.Key, _ => 0);
 
-        // Map tokens to properties
-        foreach (var prop in properties)
+        foreach (var option in metadata.Options)
         {
-            var optionAttr = prop.GetCustomAttribute<OptionAttribute>();
-            if (optionAttr == null) continue;
+            var optionAttr = option.Attribute;
 
-            // Encontrar o último token que corresponde a esta opção (Last Wins)
-            var match = tokens.LastOrDefault(t => 
+            var match = tokens.LastOrDefault(t =>
                 string.Equals(t.Key, optionAttr.OptionName, StringComparison.OrdinalIgnoreCase) ||
                 (!string.IsNullOrEmpty(optionAttr.ShortOptionName) && string.Equals(t.Key, optionAttr.ShortOptionName, StringComparison.OrdinalIgnoreCase))
             );
 
-            // Se não encontrou token para esta opção, pula (mantém valor default)
-            // Note: tokens é List<(string Key, string? Value)>, default é (null, null) se struct, mas LastOrDefault retorna default(ValueTuple) que é (null, null).
-            // Precisamos verificar se Key não é null.
             if (match.Key == null) continue;
 
-            // Increment group count if applicable
-            if (!string.IsNullOrEmpty(optionAttr.Group))
+            if (!string.IsNullOrEmpty(optionAttr.Group) && groupCounts.ContainsKey(optionAttr.Group))
             {
-                if (groupCounts.ContainsKey(optionAttr.Group))
-                {
-                    groupCounts[optionAttr.Group]++;
-                }
+                groupCounts[optionAttr.Group]++;
             }
 
-            // 5.6 Lógica Bool/Flag e 5.7 Validar Valor Ausente
-            if (prop.PropertyType == typeof(bool))
+            if (option.Property.PropertyType == typeof(bool))
             {
                 if (match.Value == null)
                 {
-                    // Flag presente sem valor explícito = true
-                    prop.SetValue(instance, true);
+                    option.Property.SetValue(instance, true);
                 }
                 else
                 {
-                    // Flag com valor explícito (ex: --verbose:false)
                     if (bool.TryParse(match.Value, out bool boolResult))
                     {
-                        prop.SetValue(instance, boolResult);
+                        option.Property.SetValue(instance, boolResult);
                     }
                     else
                     {
@@ -115,22 +101,20 @@ public static class CleanParser
             }
             else
             {
-                // Para não-booleanos, valor é obrigatório se a chave foi passada
                 if (match.Value == null)
                 {
                     throw new CleanParserException($"O argumento '{match.Key}' exige um valor, mas nenhum foi fornecido.");
                 }
 
-                // Conversão de Tipos
                 try
                 {
                     object? convertedValue = null;
 
-                    if (prop.PropertyType == typeof(string))
+                    if (option.Property.PropertyType == typeof(string))
                     {
                         convertedValue = match.Value;
                     }
-                    else if (prop.PropertyType == typeof(int))
+                    else if (option.Property.PropertyType == typeof(int))
                     {
                         if (int.TryParse(match.Value, out int intResult))
                         {
@@ -141,9 +125,8 @@ public static class CleanParser
                             throw new CleanParserException($"O valor '{match.Value}' não é válido para o argumento '{optionAttr.OptionName}'. Esperava-se um 'Int32'.");
                         }
                     }
-                    else if (prop.PropertyType == typeof(double))
+                    else if (option.Property.PropertyType == typeof(double))
                     {
-                        // 5.5 Conversão Double (Invariant Culture)
                         if (double.TryParse(match.Value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double doubleResult))
                         {
                             convertedValue = doubleResult;
@@ -154,18 +137,17 @@ public static class CleanParser
                         }
                     }
 
-                    prop.SetValue(instance, convertedValue);
+                    option.Property.SetValue(instance, convertedValue);
                 }
                 catch (Exception ex) when (ex is not CleanParserException)
                 {
-                    // Caso genérico de erro de set (improvável com os checks acima, mas segurança)
                     throw new CleanParserException($"Erro ao definir valor para '{optionAttr.OptionName}': {ex.Message}", ex);
                 }
             }
         }
 
         // 6. Validação de Regras de Negócio (Grupos)
-        foreach (var group in definedGroups)
+        foreach (var group in metadata.Groups.Values.Select(g => g.Attribute))
         {
             int count = groupCounts[group.Name];
 
@@ -202,7 +184,7 @@ public static class CleanParser
         var programDef = type.GetCustomAttribute<ProgramDefinitionAttribute>();
         if (programDef != null && programDef.PrintSummary)
         {
-            PrintSummary(instance, properties);
+            PrintSummary(instance, metadata.Options);
         }
 
         return instance;
@@ -216,8 +198,9 @@ public static class CleanParser
     public static string GetHelpText<T>()
     {
         var type = typeof(T);
+        var metadata = BuildOptionMetadata(type);
+        ValidateConfiguration(metadata);
         var programDef = type.GetCustomAttribute<ProgramDefinitionAttribute>();
-        var definedGroups = type.GetCustomAttributes<OptionGroupAttribute>().ToDictionary(g => g.Name);
         var sb = new StringBuilder();
 
         if (programDef != null)
@@ -231,48 +214,34 @@ public static class CleanParser
             sb.AppendLine();
         }
 
-        var properties = type.GetProperties();
-        
-        var ungroupedOptions = new List<PropertyInfo>();
-        var groupedOptions = new Dictionary<string, List<PropertyInfo>>();
+        var groupedOptions = metadata.Groups
+            .Where(g => g.Value.Options.Count > 0)
+            .ToDictionary(g => g.Key, g => g.Value.Options);
 
-        foreach (var prop in properties)
-        {
-            var opt = prop.GetCustomAttribute<OptionAttribute>();
-            if (opt == null) continue;
-
-            if (!string.IsNullOrEmpty(opt.Group) && definedGroups.ContainsKey(opt.Group))
-            {
-                if (!groupedOptions.ContainsKey(opt.Group))
-                    groupedOptions[opt.Group] = new List<PropertyInfo>();
-                
-                groupedOptions[opt.Group].Add(prop);
-            }
-            else
-            {
-                ungroupedOptions.Add(prop);
-            }
-        }
+        var ungroupedOptions = metadata.Options
+            .Where(opt => string.IsNullOrEmpty(opt.Attribute.Group) || !groupedOptions.ContainsKey(opt.Attribute.Group!))
+            .ToList();
 
         if (ungroupedOptions.Any())
         {
             sb.AppendLine("Options:");
-            foreach (var prop in ungroupedOptions)
+            foreach (var option in ungroupedOptions)
             {
-                sb.AppendLine(FormatOptionLine(prop));
+                sb.AppendLine(FormatOptionLine(option));
             }
             sb.AppendLine();
         }
 
         foreach (var groupName in groupedOptions.Keys)
         {
-            var groupAttr = definedGroups[groupName];
+            var group = metadata.Groups[groupName];
+            var groupAttr = group.Attribute;
             var groupDesc = !string.IsNullOrEmpty(groupAttr.Description) ? $" - {groupAttr.Description}" : "";
             sb.AppendLine($"Group: {groupName} (Requirement: {groupAttr.Require}){groupDesc}");
             
-            foreach (var prop in groupedOptions[groupName])
+            foreach (var option in groupedOptions[groupName])
             {
-                sb.AppendLine(FormatOptionLine(prop));
+                sb.AppendLine(FormatOptionLine(option));
             }
             sb.AppendLine();
         }
@@ -280,10 +249,10 @@ public static class CleanParser
         return sb.ToString().TrimEnd();
     }
 
-    private static string FormatOptionLine(PropertyInfo prop)
+    private static string FormatOptionLine(OptionDescriptor option)
     {
-        var opt = prop.GetCustomAttribute<OptionAttribute>();
-        var shortName = !string.IsNullOrEmpty(opt!.ShortOptionName) ? $"-{opt.ShortOptionName}, " : "    ";
+        var opt = option.Attribute;
+        var shortName = !string.IsNullOrEmpty(opt.ShortOptionName) ? $"-{opt.ShortOptionName}, " : "    ";
         var longName = $"--{opt.OptionName}";
         
         var line = $"  {shortName}{longName}";
@@ -300,32 +269,98 @@ public static class CleanParser
         return line;
     }
 
-    private static void PrintSummary<T>(T instance, PropertyInfo[] properties)
+    private static void PrintSummary<T>(T instance, IReadOnlyList<OptionDescriptor> options)
     {
         Console.WriteLine("Summary of Options:");
-        foreach (var prop in properties)
+        foreach (var option in options)
         {
-            var opt = prop.GetCustomAttribute<OptionAttribute>();
-            if (opt == null) continue;
-
-            var value = prop.GetValue(instance);
-            Console.WriteLine($"  {opt.OptionName}: {value}");
+            var value = option.Property.GetValue(instance);
+            Console.WriteLine($"  {option.Attribute.OptionName}: {value}");
         }
         Console.WriteLine();
+    }
+
+    private static OptionMetadata BuildOptionMetadata(Type type)
+    {
+        var groupAttributes = type.GetCustomAttributes<OptionGroupAttribute>().ToList();
+        var groups = new Dictionary<string, GroupDescriptor>();
+
+        foreach (var groupAttr in groupAttributes)
+        {
+            if (!groups.ContainsKey(groupAttr.Name))
+            {
+                groups[groupAttr.Name] = new GroupDescriptor(groupAttr);
+            }
+        }
+
+        var options = new List<OptionDescriptor>();
+
+        foreach (var property in type.GetProperties())
+        {
+            var optionAttr = property.GetCustomAttribute<OptionAttribute>();
+            if (optionAttr == null) continue;
+
+            var descriptor = new OptionDescriptor(property, optionAttr);
+            options.Add(descriptor);
+
+            if (!string.IsNullOrEmpty(optionAttr.Group) && groups.TryGetValue(optionAttr.Group, out var group))
+            {
+                group.Options.Add(descriptor);
+            }
+        }
+
+        return new OptionMetadata(type, options, groupAttributes, groups);
+    }
+
+    private sealed class OptionMetadata
+    {
+        internal OptionMetadata(Type type, IReadOnlyList<OptionDescriptor> options, IReadOnlyList<OptionGroupAttribute> groupAttributes, IReadOnlyDictionary<string, GroupDescriptor> groups)
+        {
+            Type = type;
+            Options = options;
+            GroupAttributes = groupAttributes;
+            Groups = groups;
+        }
+
+        internal Type Type { get; }
+        internal IReadOnlyList<OptionDescriptor> Options { get; }
+        internal IReadOnlyList<OptionGroupAttribute> GroupAttributes { get; }
+        internal IReadOnlyDictionary<string, GroupDescriptor> Groups { get; }
+    }
+
+    private sealed class OptionDescriptor
+    {
+        internal OptionDescriptor(PropertyInfo property, OptionAttribute attribute)
+        {
+            Property = property;
+            Attribute = attribute;
+        }
+
+        internal PropertyInfo Property { get; }
+        internal OptionAttribute Attribute { get; }
+    }
+
+    private sealed class GroupDescriptor
+    {
+        internal GroupDescriptor(OptionGroupAttribute attribute)
+        {
+            Attribute = attribute;
+            Options = new List<OptionDescriptor>();
+        }
+
+        internal OptionGroupAttribute Attribute { get; }
+        internal List<OptionDescriptor> Options { get; }
     }
 
     /// <summary>
     /// Validates the configuration of the target type T.
     /// Checks for supported types, duplicate names, and group integrity.
     /// </summary>
-    private static void ValidateConfiguration<T>()
+    private static void ValidateConfiguration(OptionMetadata metadata)
     {
-        var type = typeof(T);
-        var properties = type.GetProperties();
-        var definedGroups = type.GetCustomAttributes<OptionGroupAttribute>().ToList();
+        var type = metadata.Type;
 
-        // 3.6 Validar Duplicidade de Grupos
-        var groupNames = definedGroups.Select(g => g.Name).ToList();
+        var groupNames = metadata.GroupAttributes.Select(g => g.Name).ToList();
         if (groupNames.Count != groupNames.Distinct().Count())
         {
             throw new CleanParserException($"Configuration Error: Duplicate [OptionGroup] names found on type '{type.Name}'.");
@@ -334,25 +369,22 @@ public static class CleanParser
         var optionNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var shortOptionNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        foreach (var prop in properties)
+        foreach (var option in metadata.Options)
         {
-            var optionAttr = prop.GetCustomAttribute<OptionAttribute>();
-            if (optionAttr == null) continue;
+            var prop = option.Property;
+            var optionAttr = option.Attribute;
 
-            // 3.3 Validar Tipos Suportados
             if (!SupportedTypes.Contains(prop.PropertyType))
             {
                 throw new CleanParserException($"Configuration Error: Property '{prop.Name}' has unsupported type '{prop.PropertyType.Name}'. Supported types are: string, int, double, bool.");
             }
 
-            // 3.7 Validar Formato dos Nomes
             ValidateNameFormat(optionAttr.OptionName, "OptionName");
             if (!string.IsNullOrEmpty(optionAttr.ShortOptionName))
             {
                 ValidateNameFormat(optionAttr.ShortOptionName, "ShortOptionName");
             }
 
-            // 3.4 Validar Duplicidade de Opções
             if (!optionNames.Add(optionAttr.OptionName))
             {
                 throw new CleanParserException($"Configuration Error: Duplicate OptionName '{optionAttr.OptionName}' found.");
@@ -365,14 +397,21 @@ public static class CleanParser
                     throw new CleanParserException($"Configuration Error: Duplicate ShortOptionName '{optionAttr.ShortOptionName}' found.");
                 }
             }
-            
-            // 3.5 Validar Referência de Grupos
+
             if (!string.IsNullOrEmpty(optionAttr.Group))
             {
-                if (!groupNames.Contains(optionAttr.Group))
+                if (!metadata.Groups.ContainsKey(optionAttr.Group))
                 {
                     throw new CleanParserException($"Configuration Error: Property '{prop.Name}' references undefined group '{optionAttr.Group}'.");
                 }
+            }
+        }
+
+        foreach (var group in metadata.Groups.Values)
+        {
+            if (group.Attribute.Require == OptionGroupRequirement.All && group.Options.Count == 0)
+            {
+                throw new CleanParserException($"Configuration Error: Group '{group.Attribute.Name}' is marked as 'All' but does not contain any [Option] members.");
             }
         }
     }
