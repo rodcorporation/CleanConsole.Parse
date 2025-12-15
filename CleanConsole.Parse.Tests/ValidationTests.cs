@@ -33,14 +33,14 @@ public class ValidationTests
          Assert.Contains("must not start with prefixes", ex.Message);
     }
 
-    [ProgramDef(Name = "Test", Description = "Test")]
+    [ProgramDefinition(Name = "Test", Description = "Test")]
     private class UnsupportedTypeConfig
     {
         [Option("date")]
         public DateTime Date { get; set; }
     }
 
-    [ProgramDef(Name = "Test", Description = "Test")]
+    [ProgramDefinition(Name = "Test", Description = "Test")]
     private class DuplicateNameConfig
     {
         [Option("file")]
@@ -50,14 +50,14 @@ public class ValidationTests
         public string? File2 { get; set; }
     }
 
-    [ProgramDef(Name = "Test", Description = "Test")]
+    [ProgramDefinition(Name = "Test", Description = "Test")]
     private class InvalidGroupConfig
     {
         [Option("file", Group = "NonExistent")]
         public string? File { get; set; }
     }
 
-    [ProgramDef(Name = "Test", Description = "Test")]
+    [ProgramDefinition(Name = "Test", Description = "Test")]
     private class PrefixNameConfig
     {
         [Option("-file")]

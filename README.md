@@ -39,13 +39,12 @@ dotnet add reference ../CleanConsole.Parse/CleanConsole.Parse.csproj
 Transforme uma classe simples em uma interface de linha de comando completa em minutos.
 
 ### 1. Defina seus Argumentos
-Crie uma classe e use os atributos `[ProgramDef]` e `[Option]`.
+Crie uma classe e use os atributos `[ProgramDefinition]` e `[Option]`.
 
 ```csharp
 using CleanConsole.Parse;
-using CleanConsole.Parse.Attributes;
 
-[ProgramDef(Name = "FileCompressor", Description = "Ferramenta CLI para compressão de arquivos.")]
+[ProgramDefinition(Name = "FileCompressor", Description = "Ferramenta CLI para compressão de arquivos.")]
 public class CompressionOptions
 {
     [Option(OptionName = "input", ShortOptionName = "i")]
@@ -96,7 +95,7 @@ Precisa garantir regras de negócio complexas? Use `[OptionGroup]`.
 Exemplo: Um sistema de login que exige **Usuário+Senha** OU **Token**, mas nunca ambos.
 
 ```csharp
-[OptionGroup(Name = "AuthMethod", Type = OptionGroupType.ExactOne)]
+[OptionGroup(Name = "AuthMethod", Type = OptionGroupRequirement.ExactOne)]
 public class LoginOptions
 {
     [Option(OptionName = "token", Group = "AuthMethod")]

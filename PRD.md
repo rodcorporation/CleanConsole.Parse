@@ -59,7 +59,7 @@ Define regras combinatórias em nível de Classe.
 * **Propriedades do Atributo:**
     1.  **`Name`:** Identificador único do grupo.
     2.  **`GroupType`:** Tipo da validação (Enum).
-* **Tipos (`OptionGroupType`):**
+* **Tipos (`OptionGroupRequirement`):**
     * `ExactOne`: **Exatamente uma** propriedade do grupo deve ser preenchida.
     * `AtLeastOne`: **Pelo menos uma** propriedade do grupo deve ser preenchida.
 
@@ -78,7 +78,7 @@ Validação da integridade da classe antes do parsing. Erros de inicialização 
 * Uma propriedade referenciar um grupo não definido em `[OptionGroup]`.
 * Houver `[OptionGroup]` com nomes duplicados.
 
-#### RF10 - Configuração e Resumo (Atributo `[ProgramDef]`)
+#### RF10 - Configuração e Resumo (Atributo `[ProgramDefinition]`)
 Metadados da aplicação em nível de classe.
 * **Propriedades:** `Name`, `Description`, `PrintSummary`.
 * **Comportamento:** Se `PrintSummary = true`, imprimir no Console um resumo das opções ativadas e seus valores após o parsing.
@@ -108,13 +108,13 @@ Metadados da aplicação em nível de classe.
 using System;
 
 // RF10 - Definição do Programa
-[ProgramDef(
+[ProgramDefinition(
     Name = "DataProcessor",
     Description = "Processador de arquivos batch.",
     PrintSummary = true
 )]
 // RF07 - Definição de Grupo na Classe
-[OptionGroup(Name = "InputConfig", GroupType = OptionGroupType.ExactOne)]
+[OptionGroup(Name = "InputConfig", GroupType = OptionGroupRequirement.ExactOne)]
 public class ApplicationArgs
 {
     // RF06 - Nomes limpos (sem traços)

@@ -160,7 +160,7 @@ public static class CleanParser
         }
 
         // 7.3 Implementar PrintSummary
-        var programDef = type.GetCustomAttribute<ProgramDefAttribute>();
+        var programDef = type.GetCustomAttribute<ProgramDefinitionAttribute>();
         if (programDef != null && programDef.PrintSummary)
         {
             PrintSummary(instance, properties);
@@ -177,7 +177,7 @@ public static class CleanParser
     public static string GetHelpText<T>()
     {
         var type = typeof(T);
-        var programDef = type.GetCustomAttribute<ProgramDefAttribute>();
+        var programDef = type.GetCustomAttribute<ProgramDefinitionAttribute>();
         var sb = new StringBuilder();
 
         if (programDef != null)

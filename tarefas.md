@@ -7,8 +7,8 @@
 - [x] **1.4 Configurar Referências:** Adicionar referência do projeto Core no projeto de Testes.
 
 ## 2. Definição de Metadados (Atributos)
-- [x] **2.1 Implementar `[ProgramDef]`:** Criar atributo com propriedades `Name` (string), `Description` (string), e `PrintSummary` (bool) conforme RF10.
-- [x] **2.2 Implementar `OptionGroupType`:** Criar Enum com valores `ExactOne` e `AtLeastOne` conforme RF07.
+- [x] **2.1 Implementar `[ProgramDefinition]`:** Criar atributo com propriedades `Name` (string), `Description` (string), e `PrintSummary` (bool) conforme RF10.
+- [x] **2.2 Implementar `OptionGroupRequirement`:** Criar Enum com valores `ExactOne` e `AtLeastOne` conforme RF07.
 - [x] **2.3 Implementar `[OptionGroup]`:** Criar atributo de classe com `Name` (string) e `GroupType` (Enum) conforme RF07.
 - [x] **2.4 Implementar `[Option]`:** Criar atributo de propriedade com `OptionName` (obrigatório), `ShortOptionName` (opcional), e `Group` (opcional) conforme RF06.
 

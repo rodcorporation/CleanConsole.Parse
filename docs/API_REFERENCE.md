@@ -4,7 +4,7 @@ Esta documentação detalha os atributos e classes públicas disponíveis para u
 
 ## Atributos
 
-### `[ProgramDef]`
+### `[ProgramDefinition]`
 Define os metadados da aplicação CLI. Deve ser aplicado na classe de opções.
 
 | Propriedade | Tipo | Obrigatório | Descrição |
@@ -38,11 +38,11 @@ Define regras de validação para conjuntos de propriedades. Deve ser aplicado n
 | Propriedade | Tipo | Obrigatório | Descrição |
 | :--- | :--- | :--- | :--- |
 | `Name` | `string` | Sim | Identificador único do grupo (referenciado em `[Option]`). |
-| `Type` | `OptionGroupType` | Sim | A regra a ser aplicada (`ExactOne` ou `AtLeastOne`). |
+| `Type` | `OptionGroupRequirement` | Sim | A regra a ser aplicada (`ExactOne` ou `AtLeastOne`). |
 
 ## Enums
 
-### `OptionGroupType`
+### `OptionGroupRequirement`
 Define o comportamento de validação de um grupo.
 
 *   **`ExactOne`**: Exatamente uma das opções do grupo deve ser fornecida. Erro se 0 ou >1.

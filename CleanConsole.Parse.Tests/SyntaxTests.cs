@@ -5,7 +5,7 @@ namespace CleanConsole.Parse.Tests;
 
 public class SyntaxTests
 {
-    [ProgramDef(Name = "Test", Description = "Test")]
+    [ProgramDefinition(Name = "Test", Description = "Test")]
     public class SimpleConfig
     {
         [Option("port")]

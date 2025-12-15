@@ -31,7 +31,7 @@ O plano de tarefas foi completamente reestruturado em Épicos para refletir uma 
 
 | ID | Tarefa | Responsável | Status |
 |:---|:---|:---|:---|
-| R-01 | Unificar todos os namespaces para `CleanConsole.Parse`. | Architect | Pendente |
+| R-01 | Unificar todos os namespaces para `CleanConsole.Parse`. | Architect | Concluído |
 | R-02 | Renomear atributo `ProgramDef` para `ProgramDefinition` e seu arquivo. | Architect | Pendente |
 | R-03 | No atributo `[OptionGroup]`, renomear a propriedade `Type` para `Require`. | Architect | Pendente |
 | R-04 | Adicionar a propriedade `string Description` ao `[OptionAttribute]`. | Architect | Pendente |

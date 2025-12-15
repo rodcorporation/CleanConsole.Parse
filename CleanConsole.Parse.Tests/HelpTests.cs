@@ -5,7 +5,7 @@ namespace CleanConsole.Parse.Tests;
 
 public class HelpTests
 {
-    [ProgramDef(Name = "MyHelpApp", Description = "Does helpful things")]
+    [ProgramDefinition(Name = "MyHelpApp", Description = "Does helpful things")]
     public class HelpConfig
     {
         [Option("file", ShortOptionName = "f")]
