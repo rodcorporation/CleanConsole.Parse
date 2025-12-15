@@ -60,6 +60,19 @@ public sealed class ParseResult<T> where T : class
     public bool IsSuccess => !HelpRequested && !HasErrors;
 
     /// <summary>
+    /// Builds the formatted help description based on the stored help payload.
+    /// </summary>
+    public string GetHelpDescription()
+    {
+        if (Help is null)
+        {
+            return string.Empty;
+        }
+
+        return ParseResultFormatter.BuildHelpDescription(Help);
+    }
+
+    /// <summary>
     /// Enables implicit conversion to the options instance for backward compatibility scenarios.
     /// </summary>
     /// <param name="result">The parse result to extract the value from.</param>
