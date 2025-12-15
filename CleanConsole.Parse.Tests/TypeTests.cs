@@ -24,72 +24,98 @@ public class TypeTests
     [Fact]
     public void Should_Bind_String()
     {
-        var res = CleanParser.Parse<TypeConfig>(new[] { "-str:Hello" });
-        Assert.Equal("Hello", res.Str);
+        var result = CleanParser.Parse<TypeConfig>(new[] { "-str:Hello" });
+
+        Assert.True(result.IsSuccess);
+        var options = Assert.IsType<TypeConfig>(result.Options);
+        Assert.Equal("Hello", options.Str);
     }
 
     [Fact]
     public void Should_Bind_Int()
     {
-        var res = CleanParser.Parse<TypeConfig>(new[] { "-int=42" });
-        Assert.Equal(42, res.IntVal);
+        var result = CleanParser.Parse<TypeConfig>(new[] { "-int=42" });
+
+        Assert.True(result.IsSuccess);
+        var options = Assert.IsType<TypeConfig>(result.Options);
+        Assert.Equal(42, options.IntVal);
     }
 
     [Fact]
     public void Should_Throw_Invalid_Int()
     {
-        var ex = Assert.Throws<CleanParserException>(() => 
-            CleanParser.Parse<TypeConfig>(new[] { "-int=abc" }));
-        Assert.Contains("não é válido", ex.Message);
-        Assert.Contains("Int32", ex.Message);
+        var result = CleanParser.Parse<TypeConfig>(new[] { "-int=abc" });
+
+        Assert.True(result.HasErrors);
+        var error = Assert.Single(result.Errors);
+        Assert.Equal(ParseErrorKind.Conversion, error.Kind);
+        Assert.Contains("não é válido", error.Message);
+        Assert.Contains("Int32", error.Message);
     }
 
     [Fact]
     public void Should_Bind_Double_Invariant()
     {
-        var res = CleanParser.Parse<TypeConfig>(new[] { "-dbl=10.5" });
-        Assert.Equal(10.5, res.DblVal);
+        var result = CleanParser.Parse<TypeConfig>(new[] { "-dbl=10.5" });
+
+        Assert.True(result.IsSuccess);
+        var options = Assert.IsType<TypeConfig>(result.Options);
+        Assert.Equal(10.5, options.DblVal);
     }
 
     [Fact]
     public void Should_Throw_Invalid_Double()
     {
-        var ex = Assert.Throws<CleanParserException>(() => 
-            CleanParser.Parse<TypeConfig>(new[] { "-dbl=abc" }));
-        Assert.Contains("Double", ex.Message);
+        var result = CleanParser.Parse<TypeConfig>(new[] { "-dbl=abc" });
+
+        Assert.True(result.HasErrors);
+        var error = Assert.Single(result.Errors);
+        Assert.Equal(ParseErrorKind.Conversion, error.Kind);
+        Assert.Contains("Double", error.Message);
     }
 
     [Fact]
     public void Should_Bind_Bool_Flag()
     {
-        var res = CleanParser.Parse<TypeConfig>(new[] { "-bool" });
-        Assert.True(res.BoolVal);
+        var result = CleanParser.Parse<TypeConfig>(new[] { "-bool" });
+
+        Assert.True(result.IsSuccess);
+        var options = Assert.IsType<TypeConfig>(result.Options);
+        Assert.True(options.BoolVal);
     }
 
     [Fact]
     public void Should_Bind_Bool_Explicit()
     {
-        var resTrue = CleanParser.Parse<TypeConfig>(new[] { "-bool:true" });
-        Assert.True(resTrue.BoolVal);
+        var resultTrue = CleanParser.Parse<TypeConfig>(new[] { "-bool:true" });
+        var optionsTrue = Assert.IsType<TypeConfig>(resultTrue.Options);
+        Assert.True(optionsTrue.BoolVal);
 
-        var resFalse = CleanParser.Parse<TypeConfig>(new[] { "-bool:false" });
-        Assert.False(resFalse.BoolVal);
+        var resultFalse = CleanParser.Parse<TypeConfig>(new[] { "-bool:false" });
+        var optionsFalse = Assert.IsType<TypeConfig>(resultFalse.Options);
+        Assert.False(optionsFalse.BoolVal);
     }
 
     [Fact]
     public void Should_Throw_Missing_Value()
     {
         // -str sem valor
-        var ex = Assert.Throws<CleanParserException>(() => 
-            CleanParser.Parse<TypeConfig>(new[] { "-str" }));
-        Assert.Contains("exige um valor", ex.Message);
+        var result = CleanParser.Parse<TypeConfig>(new[] { "-str" });
+
+        Assert.True(result.HasErrors);
+        var error = Assert.Single(result.Errors);
+        Assert.Equal(ParseErrorKind.Syntax, error.Kind);
+        Assert.Contains("exige um valor", error.Message);
     }
 
     [Fact]
     public void Should_Apply_Last_Wins()
     {
-        var res = CleanParser.Parse<TypeConfig>(new[] { "-int:10", "-int:20" });
-        Assert.Equal(20, res.IntVal);
+        var result = CleanParser.Parse<TypeConfig>(new[] { "-int:10", "-int:20" });
+
+        Assert.True(result.IsSuccess);
+        var options = Assert.IsType<TypeConfig>(result.Options);
+        Assert.Equal(20, options.IntVal);
     }
 
     [Fact]
@@ -103,8 +129,10 @@ public class TypeTests
 
             var result = CleanParser.Parse<TypeConfig>();
 
-            Assert.Equal(42, result.IntVal);
-            Assert.True(result.BoolVal);
+            Assert.True(result.IsSuccess);
+            var options = Assert.IsType<TypeConfig>(result.Options);
+            Assert.Equal(42, options.IntVal);
+            Assert.True(options.BoolVal);
         }
         finally
         {

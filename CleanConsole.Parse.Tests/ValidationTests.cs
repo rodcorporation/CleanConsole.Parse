@@ -9,36 +9,46 @@ public class ValidationTests
     [Fact]
     public void Should_Throw_When_Unsupported_Type_Is_Used()
     {
-        var ex = Assert.Throws<CleanParserException>(() => CleanParser.Parse<UnsupportedTypeConfig>(new string[0]));
-        Assert.Contains("unsupported type", ex.Message);
+        var result = CleanParser.Parse<UnsupportedTypeConfig>(Array.Empty<string>());
+
+        Assert.True(result.HasErrors);
+        Assert.Contains(result.Errors, e => e.Kind == ParseErrorKind.Configuration && e.Message.Contains("unsupported type"));
     }
 
     [Fact]
     public void Should_Throw_When_Duplicate_OptionName()
     {
-        var ex = Assert.Throws<CleanParserException>(() => CleanParser.Parse<DuplicateNameConfig>(new string[0]));
-        Assert.Contains("Duplicate OptionName", ex.Message);
+        var result = CleanParser.Parse<DuplicateNameConfig>(Array.Empty<string>());
+
+        Assert.True(result.HasErrors);
+        Assert.Contains(result.Errors, e => e.Kind == ParseErrorKind.Configuration && e.Message.Contains("Duplicate OptionName"));
     }
 
     [Fact]
     public void Should_Throw_When_Group_Reference_Is_Invalid()
     {
-        var ex = Assert.Throws<CleanParserException>(() => CleanParser.Parse<InvalidGroupConfig>(new string[0]));
-        Assert.Contains("references undefined group", ex.Message);
+        var result = CleanParser.Parse<InvalidGroupConfig>(Array.Empty<string>());
+
+        Assert.True(result.HasErrors);
+        Assert.Contains(result.Errors, e => e.Kind == ParseErrorKind.Configuration && e.Message.Contains("references undefined group"));
     }
 
     [Fact]
     public void Should_Throw_When_Name_Has_Prefix()
     {
-         var ex = Assert.Throws<CleanParserException>(() => CleanParser.Parse<PrefixNameConfig>(new string[0]));
-         Assert.Contains("must not start with prefixes", ex.Message);
+        var result = CleanParser.Parse<PrefixNameConfig>(Array.Empty<string>());
+
+        Assert.True(result.HasErrors);
+        Assert.Contains(result.Errors, e => e.Kind == ParseErrorKind.Configuration && e.Message.Contains("must not start with prefixes"));
     }
 
     [Fact]
     public void Should_Throw_When_All_Group_Has_No_Options()
     {
-        var ex = Assert.Throws<CleanParserException>(() => CleanParser.Parse<AllGroupWithoutOptions>(Array.Empty<string>()));
-        Assert.Contains("is marked as 'All'", ex.Message);
+        var result = CleanParser.Parse<AllGroupWithoutOptions>(Array.Empty<string>());
+
+        Assert.True(result.HasErrors);
+        Assert.Contains(result.Errors, e => e.Kind == ParseErrorKind.Configuration && e.Message.Contains("is marked as 'All'"));
     }
 
     [ProgramDefinition(Name = "Test", Description = "Test")]

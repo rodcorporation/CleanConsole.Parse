@@ -43,25 +43,29 @@ public class GroupTests
     public void Should_Throw_When_ExactOne_Is_Zero()
     {
         // Provide AtLeastOne (X) but nothing for ExactOne
-        var ex = Assert.Throws<CleanParserException>(() => 
-            CleanParser.Parse<GroupConfig>(new[] { "-x:1" }));
-        Assert.Contains("exige exatamente uma opção", ex.Message);
+        var result = CleanParser.Parse<GroupConfig>(new[] { "-x:1" });
+
+        Assert.True(result.HasErrors);
+        Assert.Contains(result.Errors, e => e.Kind == ParseErrorKind.GroupRule && e.Message.Contains("exige exatamente uma opção"));
     }
 
     [Fact]
     public void Should_Succeed_When_ExactOne_Is_One()
     {
-        var res = CleanParser.Parse<GroupConfig>(new[] { "-a:1", "-x:1" });
-        Assert.Equal("1", res.A);
+        var result = CleanParser.Parse<GroupConfig>(new[] { "-a:1", "-x:1" });
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal("1", Assert.IsType<GroupConfig>(result.Options).A);
     }
 
     [Fact]
     public void Should_Throw_When_ExactOne_Is_Two()
     {
-        var ex = Assert.Throws<CleanParserException>(() => 
-            CleanParser.Parse<GroupConfig>(new[] { "-a:1", "-b:2", "-x:1" }));
-        Assert.Contains("exige exatamente uma opção", ex.Message);
-        Assert.Contains("foram fornecidas: 2", ex.Message);
+        var result = CleanParser.Parse<GroupConfig>(new[] { "-a:1", "-b:2", "-x:1" });
+
+        Assert.True(result.HasErrors);
+        Assert.Contains(result.Errors, e => e.Kind == ParseErrorKind.GroupRule && e.Message.Contains("exige exatamente uma opção"));
+        Assert.Contains(result.Errors, e => e.Message.Contains("foram fornecidas: 2"));
     }
 
     // --- AtLeastOne Tests ---
@@ -70,24 +74,30 @@ public class GroupTests
     public void Should_Throw_When_AtLeastOne_Is_Zero()
     {
         // Provide ExactOne (A) but nothing for AtLeastOne
-        var ex = Assert.Throws<CleanParserException>(() => 
-            CleanParser.Parse<GroupConfig>(new[] { "-a:1" }));
-        Assert.Contains("Requisito não atendido", ex.Message);
+        var result = CleanParser.Parse<GroupConfig>(new[] { "-a:1" });
+
+        Assert.True(result.HasErrors);
+        Assert.Contains(result.Errors, e => e.Kind == ParseErrorKind.GroupRule && e.Message.Contains("Requisito não atendido"));
     }
 
     [Fact]
     public void Should_Succeed_When_AtLeastOne_Is_One()
     {
-        var res = CleanParser.Parse<GroupConfig>(new[] { "-a:1", "-x:1" });
-        Assert.Equal("1", res.X);
+        var result = CleanParser.Parse<GroupConfig>(new[] { "-a:1", "-x:1" });
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal("1", Assert.IsType<GroupConfig>(result.Options).X);
     }
 
     [Fact]
     public void Should_Succeed_When_AtLeastOne_Is_Many()
     {
-        var res = CleanParser.Parse<GroupConfig>(new[] { "-a:1", "-x:1", "-y:2" });
-        Assert.Equal("1", res.X);
-        Assert.Equal("2", res.Y);
+        var result = CleanParser.Parse<GroupConfig>(new[] { "-a:1", "-x:1", "-y:2" });
+
+        Assert.True(result.IsSuccess);
+        var options = Assert.IsType<GroupConfig>(result.Options);
+        Assert.Equal("1", options.X);
+        Assert.Equal("2", options.Y);
     }
 
     // --- None Tests ---
@@ -95,25 +105,34 @@ public class GroupTests
     [Fact]
     public void Should_Succeed_When_None_Is_Zero()
     {
-        var res = CleanParser.Parse<GroupConfig>(new[] { "-a:1", "-x:1" });
-        Assert.Null(res.N1);
-        Assert.Null(res.N2);
+        var result = CleanParser.Parse<GroupConfig>(new[] { "-a:1", "-x:1" });
+
+        Assert.True(result.IsSuccess);
+        var options = Assert.IsType<GroupConfig>(result.Options);
+        Assert.Null(options.N1);
+        Assert.Null(options.N2);
     }
 
     [Fact]
     public void Should_Succeed_When_None_Is_One()
     {
-        var res = CleanParser.Parse<GroupConfig>(new[] { "-a:1", "-x:1", "-n1:test" });
-        Assert.Equal("test", res.N1);
-        Assert.Null(res.N2);
+        var result = CleanParser.Parse<GroupConfig>(new[] { "-a:1", "-x:1", "-n1:test" });
+
+        Assert.True(result.IsSuccess);
+        var options = Assert.IsType<GroupConfig>(result.Options);
+        Assert.Equal("test", options.N1);
+        Assert.Null(options.N2);
     }
 
     [Fact]
     public void Should_Succeed_When_None_Is_Many()
     {
-        var res = CleanParser.Parse<GroupConfig>(new[] { "-a:1", "-x:1", "-n1:test1", "-n2:test2" });
-        Assert.Equal("test1", res.N1);
-        Assert.Equal("test2", res.N2);
+        var result = CleanParser.Parse<GroupConfig>(new[] { "-a:1", "-x:1", "-n1:test1", "-n2:test2" });
+
+        Assert.True(result.IsSuccess);
+        var options = Assert.IsType<GroupConfig>(result.Options);
+        Assert.Equal("test1", options.N1);
+        Assert.Equal("test2", options.N2);
     }
 
     // --- AtMostOne Tests ---
@@ -121,26 +140,33 @@ public class GroupTests
     [Fact]
     public void Should_Succeed_When_AtMostOne_Is_Zero()
     {
-        var res = CleanParser.Parse<GroupConfig>(new[] { "-a:1", "-x:1" });
-        Assert.Null(res.M1);
-        Assert.Null(res.M2);
+        var result = CleanParser.Parse<GroupConfig>(new[] { "-a:1", "-x:1" });
+
+        Assert.True(result.IsSuccess);
+        var options = Assert.IsType<GroupConfig>(result.Options);
+        Assert.Null(options.M1);
+        Assert.Null(options.M2);
     }
 
     [Fact]
     public void Should_Succeed_When_AtMostOne_Is_One()
     {
-        var res = CleanParser.Parse<GroupConfig>(new[] { "-a:1", "-x:1", "-m1:test" });
-        Assert.Equal("test", res.M1);
-        Assert.Null(res.M2);
+        var result = CleanParser.Parse<GroupConfig>(new[] { "-a:1", "-x:1", "-m1:test" });
+
+        Assert.True(result.IsSuccess);
+        var options = Assert.IsType<GroupConfig>(result.Options);
+        Assert.Equal("test", options.M1);
+        Assert.Null(options.M2);
     }
 
     [Fact]
     public void Should_Throw_When_AtMostOne_Is_Many()
     {
-        var ex = Assert.Throws<CleanParserException>(() => 
-            CleanParser.Parse<GroupConfig>(new[] { "-a:1", "-x:1", "-m1:test1", "-m2:test2" }));
-        Assert.Contains("permite no máximo uma opção", ex.Message);
-        Assert.Contains("foram fornecidas: 2", ex.Message);
+        var result = CleanParser.Parse<GroupConfig>(new[] { "-a:1", "-x:1", "-m1:test1", "-m2:test2" });
+
+        Assert.True(result.HasErrors);
+        Assert.Contains(result.Errors, e => e.Kind == ParseErrorKind.GroupRule && e.Message.Contains("permite no máximo uma opção"));
+        Assert.Contains(result.Errors, e => e.Message.Contains("foram fornecidas: 2"));
     }
 
     // --- All Tests ---
@@ -170,36 +196,42 @@ public class GroupTests
     public void Should_Succeed_When_All_Group_Is_Complete()
     {
         var result = CleanParser.Parse<AllGroupConfig>(new[] { "-source:input", "-retries:3", "-verbose", "-mode:copy" });
-        Assert.Equal("input", result.Source);
-        Assert.Equal(3, result.Retries);
-        Assert.True(result.Verbose);
-        Assert.Equal("copy", result.Mode);
+
+        Assert.True(result.IsSuccess);
+        var options = Assert.IsType<AllGroupConfig>(result.Options);
+        Assert.Equal("input", options.Source);
+        Assert.Equal(3, options.Retries);
+        Assert.True(options.Verbose);
+        Assert.Equal("copy", options.Mode);
     }
 
     [Fact]
     public void Should_Throw_When_All_Group_Missing_Single_Option()
     {
-        var ex = Assert.Throws<CleanParserException>(() =>
-            CleanParser.Parse<AllGroupConfig>(new[] { "-source:input", "-verbose", "-mode:copy" }));
-        Assert.Contains("Todas as opções do grupo", ex.Message);
-        Assert.Contains("--retries", ex.Message);
+        var result = CleanParser.Parse<AllGroupConfig>(new[] { "-source:input", "-verbose", "-mode:copy" });
+
+        Assert.True(result.HasErrors);
+        Assert.Contains(result.Errors, e => e.Kind == ParseErrorKind.GroupRule && e.Message.Contains("Todas as opções do grupo"));
+        Assert.Contains(result.Errors, e => e.Message.Contains("--retries"));
     }
 
     [Fact]
     public void Should_Throw_When_All_Group_Missing_Multiple_Options()
     {
-        var ex = Assert.Throws<CleanParserException>(() =>
-            CleanParser.Parse<AllGroupConfig>(new[] { "-retries:3", "-mode:copy" }));
-        Assert.Contains("Todas as opções do grupo", ex.Message);
-        Assert.Contains("--source", ex.Message);
-        Assert.Contains("--verbose", ex.Message);
+        var result = CleanParser.Parse<AllGroupConfig>(new[] { "-retries:3", "-mode:copy" });
+
+        Assert.True(result.HasErrors);
+        Assert.Contains(result.Errors, e => e.Kind == ParseErrorKind.GroupRule && e.Message.Contains("Todas as opções do grupo"));
+        Assert.Contains(result.Errors, e => e.Message.Contains("--source"));
+        Assert.Contains(result.Errors, e => e.Message.Contains("--verbose"));
     }
 
     [Fact]
     public void Should_Still_Validate_Other_Groups_When_All_Is_Satisfied()
     {
-        var ex = Assert.Throws<CleanParserException>(() =>
-            CleanParser.Parse<AllGroupConfig>(new[] { "-source:input", "-retries:3", "-verbose" }));
-        Assert.Contains("Pelo menos uma opção do grupo 'Modes' deve ser fornecida", ex.Message);
+        var result = CleanParser.Parse<AllGroupConfig>(new[] { "-source:input", "-retries:3", "-verbose" });
+
+        Assert.True(result.HasErrors);
+        Assert.Contains(result.Errors, e => e.Kind == ParseErrorKind.GroupRule && e.Message.Contains("Pelo menos uma opção do grupo 'Modes'"));
     }
 }

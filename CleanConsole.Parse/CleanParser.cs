@@ -1,5 +1,40 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+
+namespace CleanConsole.Parse;
+
+public static class CleanParser
+{
+    private static readonly HashSet<Type> SupportedTypes = new()
+    {
+        typeof(string),
+        typeof(int),
+        typeof(double),
+        typeof(bool)
+    };
+
+    private static Func<string[]> _commandLineArgsProvider = () => Environment.GetCommandLineArgs();
+
+    internal static Func<string[]> CommandLineArgsProvider
+    {
+        get => _commandLineArgsProvider;
+        set => _commandLineArgsProvider = value ?? throw new ArgumentNullException(nameof(value));
+    }
+
+    public static ParseResult<T> Parse<T>() where T : class, new()
+    {
+        var args = CommandLineArgsProvider.Invoke() ?? Array.Empty<string>();
+        var effectiveArgs = args.Length > 0 && Path.IsPathRooted(args[0])
+            ? args.Skip(1).ToArray()
+            : args;
+
+        return Parse<T>(effectiveArgs);
+    }
+
     public static ParseResult<T> Parse<T>(string[] args) where T : class, new()
     {
         var errors = new List<ParseError>();
