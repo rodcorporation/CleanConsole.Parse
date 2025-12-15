@@ -12,7 +12,7 @@ public sealed class OptionGroupAttribute : Attribute
     /// The unique name of the group.
     /// Used to link properties via the [Option(Group = "Name")] property.
     /// </summary>
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; }
 
     /// <summary>
     /// The validation rule to apply to this group.
