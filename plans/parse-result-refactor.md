@@ -6,6 +6,12 @@
 	- Resultado: fluxo de help não é tratado em Parse<T>(); o pedido de ajuda exige chamada explícita de CleanParser.GetHelpText<T>(), já que não há interceptação de --help, -h ou equivalente.
 	- Resultado: fluxos de exceção disparam CleanParserException em validações de configuração (nomes duplicados, tipos não suportados, grupos inválidos), tokenização sem prefixo (-, --, /), argumentos faltantes ou com tipagem incorreta e violações de regras de grupo (ExactOne, AtLeastOne, AtMostOne, All).
 1.2 Inventariar dependências e expectativas atuais nos testes de [CleanConsole.Parse.Tests](CleanConsole.Parse.Tests) e em atributos de [CleanConsole.Parse/Attributes](CleanConsole.Parse/Attributes).
+	- Observação: testes de sucesso confirmam que CleanParser.Parse retorna a instância concreta de configuração com vinculação por nome longo usando separadores : ou =, suportando valores com aspas e regra last wins em tokens repetidos.
+	- Observação: testes de tipo garantem conversão para string, int, double (CultureInfo.InvariantCulture) e bool, incluindo flag sem valor que liga true; falhas de conversão precisam gerar CleanParserException com mensagens contendo o tipo destino e trechos como "não é válido".
+	- Observação: testes de sintaxe aceitam prefixos -, -- e / e esperam CleanParserException com trecho "Erro de sintaxe" quando tokens aparecem sem prefixo ou há separação por espaço.
+	- Observação: testes de validação exigem CleanParserException em erros de configuração com mensagens específicas: "unsupported type", "Duplicate OptionName", "references undefined group", "must not start with prefixes", "is marked as 'All'".
+	- Observação: testes de grupos requerem contagem das opções por grupo aplicando ExactOne, AtLeastOne, AtMostOne e All, com mensagens contendo os valores numéricos reportados (por exemplo "foram fornecidas: 2").
+	- Observação: testes atuais não cobrem fluxo de help via Parse e dependem do atributo ProgramDefinition para ativar PrintSummary ou fornecer metadados ao GetHelpText.
 1.3 Definir com arquitetura e UX a estrutura final de ParseResult<T> (nomes, tipos e semântica de Help, HasErrors, Errors e Options/Value).
 1.4 Especificar requisitos de formato para GetHelpDescription e GetSelectedSummary, alinhando estilo de console com o agente UX.
 
