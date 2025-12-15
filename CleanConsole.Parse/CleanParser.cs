@@ -254,7 +254,8 @@ public static class CleanParser
             var group = metadata.Groups[groupName];
             var groupAttr = group.Attribute;
             var groupDesc = !string.IsNullOrEmpty(groupAttr.Description) ? $" - {groupAttr.Description}" : "";
-            sb.AppendLine($"Group: {groupName} (Requirement: {groupAttr.Require}){groupDesc}");
+            var requirementLabel = FormatRequirementLabel(groupAttr.Require);
+            sb.AppendLine($"Group: {groupName} (Requirement: {requirementLabel}){groupDesc}");
             
             foreach (var option in groupedOptions[groupName])
             {
@@ -264,6 +265,15 @@ public static class CleanParser
         }
 
         return sb.ToString().TrimEnd();
+    }
+
+    private static string FormatRequirementLabel(OptionGroupRequirement requirement)
+    {
+        return requirement switch
+        {
+            OptionGroupRequirement.All => "All (todas obrigatórias)",
+            _ => requirement.ToString()
+        };
     }
 
     private static string FormatOptionLine(OptionDescriptor option)
