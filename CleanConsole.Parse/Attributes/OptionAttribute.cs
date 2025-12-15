@@ -27,6 +27,12 @@ public sealed class OptionAttribute : Attribute
     public string? Group { get; set; }
 
     /// <summary>
+    /// A brief description of what this option does.
+    /// Used when generating help text.
+    /// </summary>
+    public string? Description { get; set; }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="OptionAttribute"/> class.
     /// </summary>
     /// <param name="optionName">The mandatory long name of the option.</param>

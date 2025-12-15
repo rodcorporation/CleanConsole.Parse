@@ -23,6 +23,7 @@ Marca uma propriedade para ser preenchida via argumento de linha de comando.
 | `OptionName` | `string` | Sim | O nome longo do argumento (ex: `port` para `--port`). **Não use prefixos.** |
 | `ShortOptionName` | `string` | Não | O alias curto (ex: `p` para `-p`). **Não use prefixos.** |
 | `Group` | `string` | Não | Nome do grupo de validação ao qual esta opção pertence. |
+| `Description` | `string` | Não | Descrição da opção para exibição na ajuda. |
 
 **Tipos Suportados:**
 *   `string`
@@ -40,6 +41,7 @@ O construtor aceita o nome do grupo e seu requisito de validação.
 | :--- | :--- | :--- | :--- |
 | `name` | `string` | Sim | Identificador único do grupo (referenciado em `[Option]`). |
 | `require` | `OptionGroupRequirement` | Sim | A regra de validação a ser aplicada (`ExactOne`, `AtLeastOne`, `None`, ou `AtMostOne`). |
+| `Description` | `string` | Não | Descrição do grupo para exibição na ajuda. |
 
 ## Enums
 

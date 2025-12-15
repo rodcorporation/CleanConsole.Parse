@@ -33,9 +33,9 @@ O plano de tarefas foi completamente reestruturado em Épicos para refletir uma 
 |:---|:---|:---|:---|
 | R-01 | Unificar todos os namespaces para `CleanConsole.Parse`. | Architect | Concluído |
 | R-02 | Renomear atributo `ProgramDef` para `ProgramDefinition` e seu arquivo. | Architect | Concluído |
-| R-03 | No atributo `[OptionGroup]`, renomear a propriedade `Type` para `Require`. | Architect | Pendente |
-| R-04 | Adicionar a propriedade `string Description` ao `[OptionAttribute]`. | Architect | Pendente |
-| R-05 | Adicionar a propriedade `string Description` ao `[OptionGroupAttribute]`. | Architect | Pendente |
+| R-03 | No atributo `[OptionGroup]`, renomear a propriedade `Type` para `Require`. | Architect | Concluído |
+| R-04 | Adicionar a propriedade `string Description` ao `[OptionAttribute]`. | Architect | Concluído |
+| R-05 | Adicionar a propriedade `string Description` ao `[OptionGroupAttribute]`. | Architect | Concluído |
 | R-06 | **(Cancelado)** Mover `OptionGroupRequirement.cs` da pasta `Enums` para a raiz. | Architect | Cancelado |
 
 #### **Épico 2: Implementação dos Novos Tipos de Grupo**
@@ -43,41 +43,44 @@ O plano de tarefas foi completamente reestruturado em Épicos para refletir uma 
 
 | ID | Tarefa | Responsável | Status |
 |:---|:---|:---|:---|
-| F-01 | Atualizar o enum `OptionGroupRequirement` com os valores `None` e `AtMostOne`. | Core Eng | Pendente |
-| F-02 | Implementar a lógica de validação para `None` no `CleanParser`. | Core Eng | Pendente |
-| F-03 | Implementar a lógica de validação para `AtMostOne` no `CleanParser`. | Core Eng | Pendente |
+| F-01 | Atualizar o enum `OptionGroupRequirement` com os valores `None` e `AtMostOne`. | Core Eng | Concluído |
+| F-02 | Implementar a lógica de validação para `None` no `CleanParser`. | Core Eng | Concluído |
+| F-03 | Implementar a lógica de validação para `AtMostOne` no `CleanParser`. | Core Eng | Concluído |
 
 #### **Épico 3: Experiência do Usuário (UX) e Geração de Ajuda**
 *Objetivo: Garantir que a saída do console (ajuda e erros) seja clara e informativa.*
 
 | ID | Tarefa | Responsável | Status |
 |:---|:---|:---|:---|
-| UX-01 | Desenhar o formato de exibição do texto de ajuda (`--help`) para os grupos, incluindo suas `Description` e requisito (`None`, `AtMostOne`, etc.). | UX Specialist | Pendente |
-| UX-02 | Desenhar a mensagem de erro específica para a violação da regra `AtMostOne`. | UX Specialist | Pendente |
-| UX-03 | Implementar a nova geração de `GetHelpText` para refletir o design da tarefa UX-01. | Core Eng | Pendente |
+| UX-01 | Desenhar o formato de exibição do texto de ajuda (`--help`) para os grupos, incluindo suas `Description` e requisito (`None`, `AtMostOne`, etc.). | UX Specialist | Concluído |
+| UX-02 | Desenhar a mensagem de erro específica para a violação da regra `AtMostOne`. | UX Specialist | Concluído |
+| UX-03 | Implementar a nova geração de `GetHelpText` para refletir o design da tarefa UX-01. | Core Eng | Concluído |
 
 #### **Épico 4: Testes e Garantia de Qualidade (QA)**
 *Objetivo: Assegurar que as novas funcionalidades e refatorações sejam robustas e não introduzam regressões.*
 
 | ID | Tarefa | Responsável | Status |
 |:---|:---|:---|:---|
-| T-01 | Criar testes unitários para o requisito de grupo `None`. | QA Eng | Pendente |
-| T-02 | Criar testes unitários para o requisito de grupo `AtMostOne` (sucesso e falha). | QA Eng | Pendente |
-| T-03 | Criar teste unitário que valide a nova mensagem de erro da tarefa UX-02. | QA Eng | Pendente |
-| T-04 | Criar testes para verificar se a `Description` de `[Option]` e `[OptionGroup]` aparece no `GetHelpText`. | QA Eng | Pendente |
-| T-05 | Criar testes para as refatorações de nomenclatura (`ProgramDefinition`, `Require`). | QA Eng | Pendente |
+| T-01 | Criar testes unitários para o requisito de grupo `None`. | QA Eng | Concluído |
+| T-02 | Criar testes unitários para o requisito de grupo `AtMostOne` (sucesso e falha). | QA Eng | Concluído |
+| T-03 | Criar teste unitário que valide a nova mensagem de erro da tarefa UX-02. | QA Eng | Concluído |
+| T-04 | Criar testes para verificar se a `Description` de `[Option]` e `[OptionGroup]` aparece no `GetHelpText`. | QA Eng | Concluído |
+| T-05 | Criar testes para as refatorações de nomenclatura (`ProgramDefinition`, `Require`). | QA Eng | Concluído |
 
 #### **Épico 5: Documentação e Finalização**
 *Objetivo: Realizar a revisão final e atualizar toda a documentação do projeto para refletir as mudanças.*
 
 | ID | Tarefa | Responsável | Status |
 |:---|:---|:---|:---|
-| D-01 | Realizar a Revisão de Código (Code Review) de todas as implementações. | Architect | Pendente |
-| D-02 | Atualizar `docs/API_REFERENCE.md` com todas as mudanças na API (atributos, propriedades e enums). | Architect | Pendente |
-| D-03 | Atualizar `README.md` com exemplos das novas funcionalidades. | Architect | Pendente |
-| D-04 | Atualizar `PRD.md` para refletir a nova arquitetura de namespace único e as novas funcionalidades. | Architect | Pendente |
-| D-05 | Adicionar exemplos de uso dos novos tipos de grupo em `docs/BEST_PRACTICES.md` ou `GETTING_STARTED.md`. | Architect | Pendente |
-| D-06 | Revisar e atualizar os arquivos em `agents/` se a refatoração da API impactar as responsabilidades. | Architect | Pendente |
+| D-01 | Realizar a Revisão de Código (Code Review) de todas as implementações. | Architect | Concluído |
+| D-02 | Atualizar `docs/API_REFERENCE.md` com todas as mudanças na API (atributos, propriedades e enums). | Architect | Concluído |
+| D-03 | Atualizar `README.md` com exemplos das novas funcionalidades. | Architect | Concluído |
+| D-04 | Atualizar `PRD.md` para refletir a nova arquitetura de namespace único e as novas funcionalidades. | Architect | Cancelado |
+| D-05 | Adicionar exemplos de uso dos novos tipos de grupo em `docs/BEST_PRACTICES.md` ou `GETTING_STARTED.md`. | Architect | Concluído |
+| D-06 | Revisar e atualizar os arquivos em `agents/` se a refatoração da API impactar as responsabilidades. | Architect | Concluído |
+| D-07 | Remover `tarefas.md`. | Architect | Concluído |
+| D-08 | Remover `PRD.md`. | Architect | Concluído |
+| D-09 | Remover referências a `tarefas.md` e `PRD.md` de todos os arquivos do projeto. | Architect | Concluído |
 
 ---
 *Aprovado por:* Solutions Architect

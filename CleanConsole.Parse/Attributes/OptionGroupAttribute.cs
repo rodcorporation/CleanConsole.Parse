@@ -20,6 +20,12 @@ public sealed class OptionGroupAttribute : Attribute
     public OptionGroupRequirement Require { get; }
 
     /// <summary>
+    /// A brief description of what this group represents.
+    /// Used when generating help text.
+    /// </summary>
+    public string? Description { get; set; }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="OptionGroupAttribute"/> class.
     /// </summary>
     /// <param name="name">The unique name of the group.</param>
