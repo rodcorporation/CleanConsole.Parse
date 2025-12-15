@@ -59,22 +59,31 @@ public class CompressionOptions
 ```
 
 ### 2. Processe no `Main`
-No seu `Program.cs`, chame o parser.
+No seu `Program.cs`, consuma o `ParseResult<CompressionOptions>`.
 
 ```csharp
-try 
-{
-    // O parser lê 'args', valida e popula a classe
-    var options = CleanParser.Parse<CompressionOptions>(args);
+var result = CleanParser.Parse<CompressionOptions>(args);
 
-    Console.WriteLine($"Comprimindo '{options.InputFile}' (Nível {options.CompressionLevel})...");
-}
-catch (CleanParserException ex)
+if (result.HelpRequested)
 {
-    // Exibe o erro e a tela de ajuda automaticamente se algo der errado
-    Console.WriteLine($"Erro: {ex.Message}");
-    Console.WriteLine(CleanParser.GetHelpText<CompressionOptions>());
+    Console.WriteLine(result.GetHelpDescription());
+    return;
 }
+
+if (result.HasErrors)
+{
+    Console.Error.WriteLine("Ocorreram erros:");
+    foreach (var error in result.Errors)
+    {
+        Console.Error.WriteLine($"- {error.Message}");
+    }
+    return;
+}
+
+var options = result.Options!;
+Console.WriteLine($"Comprimindo '{options.InputFile}' (Nível {options.CompressionLevel})...");
+Console.WriteLine();
+Console.WriteLine(result.GetSelectedSummary());
 ```
 
 ### 3. Resultado
@@ -85,6 +94,8 @@ O objeto `options` será:
 *   `InputFile`: "dados.dat"
 *   `CompressionLevel`: 9
 *   `Verbose`: true
+
+E `result.GetSelectedSummary()` produzirá um resumo pronto para logar.
 
 ---
 
@@ -98,13 +109,13 @@ Exemplo: Um sistema de login que exige **Usuário+Senha** OU **Token**, mas nunc
 [OptionGroup("AuthMethod", OptionGroupRequirement.ExactOne)]
 public class LoginOptions
 {
-    [Option(OptionName = "token", Group = "AuthMethod")]
-    public string AuthToken { get; set; }
+    [Option("token", Group = "AuthMethod")]
+    public string? AuthToken { get; set; }
 
-    [Option(OptionName = "user", Group = "AuthMethod")]
-    public string Username { get; set; }
+    [Option("user", Group = "AuthMethod")]
+    public string? Username { get; set; }
 }
-// O parser lançará erro se o usuário fornecer ambos ou nenhum!
+// result.HasErrors será verdadeiro se o usuário fornecer ambos ou nenhum.
 ```
 
 Também é possível exigir que todas as opções de um conjunto sejam fornecidas usando `OptionGroupRequirement.All`.
@@ -113,16 +124,16 @@ Também é possível exigir que todas as opções de um conjunto sejam fornecida
 [OptionGroup("Sync", OptionGroupRequirement.All)]
 public class SyncOptions
 {
-    [Option(OptionName = "source", Group = "Sync")]
-    public string Source { get; set; }
+    [Option("source", Group = "Sync")]
+    public string? Source { get; set; }
 
-    [Option(OptionName = "target", Group = "Sync")]
-    public string Target { get; set; }
+    [Option("target", Group = "Sync")]
+    public string? Target { get; set; }
 
-    [Option(OptionName = "audit", Group = "Sync")]
+    [Option("audit", Group = "Sync")]
     public bool Audit { get; set; }
 }
-// Faltou um dos argumentos? O erro listará exatamente qual faltou.
+// Um ParseResult com HasErrors = true indicará as opções faltantes.
 ```
 
 ---

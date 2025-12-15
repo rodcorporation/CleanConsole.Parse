@@ -54,7 +54,52 @@ Define o comportamento de validação de um grupo.
 *   **`AtMostOne`**: Nenhuma opção do grupo é obrigatória, mas no máximo uma pode ser fornecida. Erro se >1.
 *   **`All`**: Todas as opções do grupo devem ser fornecidas. Erro se qualquer membro estiver ausente.
 
+## Resultados do Parser
+
+### `ParseResult<T>`
+Retorno padrão de `CleanParser.Parse<T>()`. Encapsula o objeto de opções, erros e payload de ajuda.
+
+| Propriedade | Tipo | Descrição |
+| :--- | :--- | :--- |
+| `Options` / `Value` | `T?` | Instância populada quando o parsing conclui; nula em falhas. |
+| `IsSuccess` | `bool` | Verdadeiro quando não houve `HasErrors` nem `HelpRequested`. |
+| `HasErrors` | `bool` | Indica se a coleção `Errors` contém itens. |
+| `Errors` | `IReadOnlyList<ParseError>` | Lista de erros agregados na execução. |
+| `HelpRequested` | `bool` | Verdadeiro quando o usuário solicitou ajuda (`--help`, `-h`, `/?`). |
+| `Help` | `ParseHelpPayload?` | Payload estruturado usado por `GetHelpDescription()`. |
+| `GetHelpDescription()` | `string` | Produz o texto de ajuda conforme especificação de UX. |
+| `GetSelectedSummary()` | `string` | Retorna um resumo formatado das opções selecionadas. |
+
+### `ParseError`
+Representa um erro coletado durante o parsing.
+
+| Propriedade | Tipo | Descrição |
+| :--- | :--- | :--- |
+| `Kind` | `ParseErrorKind` | Categoria do erro (configuração, conversão, sintaxe, regras de grupo ou help). |
+| `Message` | `string` | Mensagem pronta para exibição ao usuário. |
+| `OptionName` | `string?` | Nome da opção ou grupo relacionado ao erro, quando aplicável. |
+
+### `ParseErrorKind`
+Enumeração que categoriza erros para diagnóstico rápido.
+
+* `Configuration`
+* `Conversion`
+* `Syntax`
+* `GroupRule`
+* `HelpRequest`
+
+### `ParseHelpPayload`
+Describe a estrutura bruta usada para montar a saída de ajuda. Normalmente você não instancia esta classe diretamente, mas pode inspecionar as propriedades quando `HelpRequested` for verdadeiro.
+
+| Propriedade | Tipo | Descrição |
+| :--- | :--- | :--- |
+| `Title` / `Description` | `string?` | Metadados vindos de `[ProgramDefinition]`. |
+| `Usage` | `string?` | Linha de uso padrão (`app [options]`). |
+| `Options` | `IReadOnlyList<ParseHelpOption>` | Opções renderizadas na ajuda. |
+| `Groups` | `IReadOnlyList<ParseHelpGroup>` | Grupos com descrições e regras. |
+| `Examples` | `IReadOnlyList<string>` | Exemplos adicionais definidos pelo integrador. |
+
 ## Exceções
 
 ### `CleanParserException`
-Todas as exceções lançadas pela biblioteca herdam desta classe. Capture-a para exibir mensagens de erro amigáveis ao usuário final. A mensagem da exceção já está formatada para exibição (Actionable Error Message).
+`Parse<T>` retorna `ParseResult<T>` e não lança mais `CleanParserException` para erros de entrada. A exceção permanece disponível para cenários de configuração incorreta detectados em tempo de inicialização (ex.: chamadas diretas a `CleanParser.GetHelpText<T>()` ou utilitários internos que validam atributos sem contexto de execução). Use-a para identificar falhas críticas de configuração durante o desenvolvimento.

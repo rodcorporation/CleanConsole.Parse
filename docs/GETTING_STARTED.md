@@ -22,16 +22,16 @@ Crie uma classe POCO e decore-a com os atributos da biblioteca.
 ```csharp
 using CleanConsole.Parse;
 
-[ProgramDef(Name = "MeuApp", Description = "Exemplo de CLI.")]
+[ProgramDefinition(Name = "MeuApp", Description = "Exemplo de CLI.")]
 public class MyArgs
 {
-    [Option(OptionName = "input", ShortOptionName = "i")]
-    public string InputFile { get; set; }
+    [Option("input", ShortOptionName = "i", Description = "Arquivo de entrada")]
+    public string? InputFile { get; set; }
 
-    [Option(OptionName = "retry")]
+    [Option("retry", Description = "Número de tentativas")]
     public int RetryCount { get; set; } = 3; // Valor padrão
 
-    [Option(OptionName = "verbose", ShortOptionName = "v")]
+    [Option("verbose", ShortOptionName = "v", Description = "Modo detalhado")]
     public bool Verbose { get; set; }
 }
 ```
@@ -41,22 +41,34 @@ public class MyArgs
 ```csharp
 using CleanConsole.Parse;
 
-try 
-{
-    // args vem do método Main(string[] args)
-    var arguments = CleanParser.Parse<MyArgs>(args);
+// args vem do método Main(string[] args)
+var result = CleanParser.Parse<MyArgs>(args);
 
-    Console.WriteLine($"Processando arquivo: {arguments.InputFile}");
-    if (arguments.Verbose) Console.WriteLine("Modo verboso ativado.");
-}
-catch (CleanParserException ex)
+if (result.HelpRequested)
 {
-    // O erro já vem formatado para o usuário
-    Console.WriteLine($"Erro: {ex.Message}");
-    
-    // Imprime o ajuda automaticamente
-    Console.WriteLine(CleanParser.GetHelpText<MyArgs>());
+    Console.WriteLine(result.GetHelpDescription());
+    return;
 }
+
+if (result.HasErrors)
+{
+    Console.Error.WriteLine("Ocorreram erros de validação:");
+    foreach (var error in result.Errors)
+    {
+        Console.Error.WriteLine($"- {error.Message}");
+    }
+    return;
+}
+
+var options = result.Options!;
+Console.WriteLine($"Processando arquivo: {options.InputFile}");
+if (options.Verbose)
+{
+    Console.WriteLine("Modo verboso ativado.");
+}
+
+Console.WriteLine();
+Console.WriteLine(result.GetSelectedSummary());
 ```
 
 ## Exemplo: Grupos com Regra `All`
@@ -92,7 +104,7 @@ Uso típico:
 sync.exe --source:"c:/dados" --target:"d:/mirror" --audit --mirror
 ```
 
-Se qualquer opção do grupo `SyncConfig` estiver ausente, o `CleanParser` lançará uma `CleanParserException` indicando exatamente quais argumentos faltaram (ex.: `--source`, `--target`).
+Se qualquer opção do grupo `SyncConfig` estiver ausente, o `CleanParser.Parse<SyncOptions>` retornará um `ParseResult<SyncOptions>` com `HasErrors = true` e uma entrada em `Errors` descrevendo quais argumentos faltaram (ex.: `--source`, `--target`).
 
 ## Formatos de Comando Suportados
 

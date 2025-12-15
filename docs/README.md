@@ -8,7 +8,7 @@ Bem-vindo à documentação oficial do **CleanConsole.Parse**. Aqui você encont
 Guia rápido para instalação e criação do seu primeiro CLI. Ideal para novos usuários.
 
 ### 📖 [Referência da API (API Reference)](API_REFERENCE.md)
-Documentação técnica detalhada de todos os Atributos (`[Option]`, `[ProgramDef]`, etc.), Enums e Exceções.
+Documentação técnica detalhada de todos os Atributos (`[Option]`, `[ProgramDefinition]`, etc.), enums, `ParseResult<T>` e classes auxiliares.
 
 ### 🏗️ [Arquitetura](ARCHITECTURE.md)
 Explicação profunda sobre o funcionamento interno da biblioteca, fluxo de parsing, decisões de design e validações.
