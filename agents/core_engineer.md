@@ -28,5 +28,4 @@ Responsável pela manutenção e otimização do "coração" do sistema: o motor
 - **Cultura:** Manter rigor na independência de Locale.
 
 ## Histórico de Implementação
-As responsabilidades iniciais deste agente foram mapeadas nas **Tarefas 4, 5 e 6** do `tarefas.md`.
-
+(Histórico de Implementação removido pois tarefas antigas foram consolidadas no plano principal).

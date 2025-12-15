@@ -95,7 +95,7 @@ Precisa garantir regras de negócio complexas? Use `[OptionGroup]`.
 Exemplo: Um sistema de login que exige **Usuário+Senha** OU **Token**, mas nunca ambos.
 
 ```csharp
-[OptionGroup(Name = "AuthMethod", Type = OptionGroupRequirement.ExactOne)]
+[OptionGroup("AuthMethod", OptionGroupRequirement.ExactOne)]
 public class LoginOptions
 {
     [Option(OptionName = "token", Group = "AuthMethod")]

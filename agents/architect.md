@@ -13,10 +13,10 @@ Responsável pela manutenção da estrutura fundamental do projeto, evolução d
 ### 2. Evolução da API (Atributos)
 - Gerenciar alterações na "cara" da biblioteca (`Attributes`).
 - **Arquivos sob responsabilidade:**
-  - `ProgramDefAttribute.cs`
+  - `ProgramDefinitionAttribute.cs`
   - `OptionAttribute.cs`
   - `OptionGroupAttribute.cs`
-  - `OptionGroupType.cs`
+  - `OptionGroupRequirement.cs`
 
 ### 3. Validação de Inicialização (Startup Check)
 - Manter e expandir a lógica que valida a classe POCO do usuário antes do parsing.
@@ -28,5 +28,4 @@ Responsável pela manutenção da estrutura fundamental do projeto, evolução d
 - **Convenção:** Manter estrita adesão às convenções C#.
 
 ## Histórico de Implementação
-As responsabilidades iniciais deste agente foram mapeadas nas **Tarefas 1, 2 e 3** do `tarefas.md`.
-
+(Histórico de Implementação removido pois tarefas antigas foram consolidadas no plano principal).

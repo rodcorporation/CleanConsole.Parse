@@ -6,8 +6,8 @@ namespace CleanConsole.Parse.Tests;
 public class GroupTests
 {
     [ProgramDefinition(Name = "Test", Description = "Test")]
-    [OptionGroup(Name = "Exact", Type = OptionGroupRequirement.ExactOne)]
-    [OptionGroup(Name = "AtLeast", Type = OptionGroupRequirement.AtLeastOne)]
+    [OptionGroup("Exact", OptionGroupRequirement.ExactOne)]
+    [OptionGroup("AtLeast", OptionGroupRequirement.AtLeastOne)]
     public class GroupConfig
     {
         [Option("a", Group = "Exact")]

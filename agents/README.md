@@ -1,6 +1,6 @@
 # Índice de Agentes - CleanConsole.Parse
 
-Este diretório contém as definições dos agentes especializados responsáveis pela manutenção e evolução do projeto. Cada agente detém o conhecimento de domínio sobre áreas específicas do sistema, mapeadas historicamente em `tarefas.md` e `PRD.md`.
+Este diretório contém as definições dos agentes especializados responsáveis pela manutenção e evolução do projeto. Cada agente detém o conhecimento de domínio sobre áreas específicas do sistema.
 
 ## Lista de Agentes
 

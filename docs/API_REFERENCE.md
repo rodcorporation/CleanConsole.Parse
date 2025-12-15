@@ -34,11 +34,12 @@ Marca uma propriedade para ser preenchida via argumento de linha de comando.
 
 ### `[OptionGroup]`
 Define regras de validação para conjuntos de propriedades. Deve ser aplicado na classe.
+O construtor aceita o nome do grupo e seu requisito de validação.
 
-| Propriedade | Tipo | Obrigatório | Descrição |
+| Parâmetro | Tipo | Obrigatório | Descrição |
 | :--- | :--- | :--- | :--- |
-| `Name` | `string` | Sim | Identificador único do grupo (referenciado em `[Option]`). |
-| `Type` | `OptionGroupRequirement` | Sim | A regra a ser aplicada (`ExactOne` ou `AtLeastOne`). |
+| `name` | `string` | Sim | Identificador único do grupo (referenciado em `[Option]`). |
+| `require` | `OptionGroupRequirement` | Sim | A regra de validação a ser aplicada (`ExactOne`, `AtLeastOne`, `None`, ou `AtMostOne`). |
 
 ## Enums
 
@@ -47,6 +48,8 @@ Define o comportamento de validação de um grupo.
 
 *   **`ExactOne`**: Exatamente uma das opções do grupo deve ser fornecida. Erro se 0 ou >1.
 *   **`AtLeastOne`**: Pelo menos uma opção deve ser fornecida. Erro se 0.
+*   **`None`**: Nenhuma opção do grupo é obrigatória. Qualquer número de opções (0 a N) pode ser fornecido.
+*   **`AtMostOne`**: Nenhuma opção do grupo é obrigatória, mas no máximo uma pode ser fornecida. Erro se >1.
 
 ## Exceções
 
