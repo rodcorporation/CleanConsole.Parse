@@ -64,6 +64,9 @@ public static class CleanParser
 
         // Rastreamento para validação de grupos
         var groupCounts = metadata.Groups.ToDictionary(g => g.Key, _ => 0);
+        var groupMissingOptions = metadata.Groups.ToDictionary(
+            g => g.Key,
+            g => new HashSet<OptionDescriptor>(g.Value.Options));
 
         foreach (var option in metadata.Options)
         {
@@ -79,6 +82,10 @@ public static class CleanParser
             if (!string.IsNullOrEmpty(optionAttr.Group) && groupCounts.ContainsKey(optionAttr.Group))
             {
                 groupCounts[optionAttr.Group]++;
+                if (groupMissingOptions.TryGetValue(optionAttr.Group, out var missingSet))
+                {
+                    missingSet.Remove(option);
+                }
             }
 
             if (option.Property.PropertyType == typeof(bool))
@@ -147,30 +154,40 @@ public static class CleanParser
         }
 
         // 6. Validação de Regras de Negócio (Grupos)
-        foreach (var group in metadata.Groups.Values.Select(g => g.Attribute))
+        foreach (var groupEntry in metadata.Groups)
         {
-            int count = groupCounts[group.Name];
+            var groupAttr = groupEntry.Value.Attribute;
+            int count = groupCounts[groupAttr.Name];
 
-            switch (group.Require)
+            switch (groupAttr.Require)
             {
                 case OptionGroupRequirement.ExactOne:
                     if (count != 1)
                     {
-                        throw new CleanParserException($"Conflito de opções: O grupo '{group.Name}' exige exatamente uma opção, mas foram fornecidas: {count}.");
+                        throw new CleanParserException($"Conflito de opções: O grupo '{groupAttr.Name}' exige exatamente uma opção, mas foram fornecidas: {count}.");
                     }
                     break;
 
                 case OptionGroupRequirement.AtLeastOne:
                     if (count == 0)
                     {
-                        throw new CleanParserException($"Requisito não atendido: Pelo menos uma opção do grupo '{group.Name}' deve ser fornecida.");
+                        throw new CleanParserException($"Requisito não atendido: Pelo menos uma opção do grupo '{groupAttr.Name}' deve ser fornecida.");
                     }
                     break;
 
                 case OptionGroupRequirement.AtMostOne:
                     if (count > 1)
                     {
-                        throw new CleanParserException($"Conflito de opções: O grupo '{group.Name}' permite no máximo uma opção, mas foram fornecidas: {count}.");
+                        throw new CleanParserException($"Conflito de opções: O grupo '{groupAttr.Name}' permite no máximo uma opção, mas foram fornecidas: {count}.");
+                    }
+                    break;
+
+                case OptionGroupRequirement.All:
+                    var missing = groupMissingOptions[groupAttr.Name];
+                    if (missing.Count > 0)
+                    {
+                        var missingList = string.Join(", ", missing.Select(o => $"--{o.Attribute.OptionName}"));
+                        throw new CleanParserException($"Requisito não atendido: Todas as opções do grupo '{groupAttr.Name}' devem ser fornecidas. Ausentes: {missingList}.");
                     }
                     break;
 
