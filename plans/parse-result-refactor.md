@@ -19,6 +19,11 @@
 	- Decisão: Propriedade Help (ParseHelpPayload?) só é preenchida quando help é solicitado; o payload mantém Title, Description, Usage e coleções de opções e grupos pré-formatadas para consumo por GetHelpDescription e GetSelectedSummary.
 	- Decisão: Propriedade HelpRequested (bool) diferencia respostas de help sem tratar como erro; IsSuccess (bool) será exposta para indicar ausência de erros e help simultaneamente.
 1.4 Especificar requisitos de formato para GetHelpDescription e GetSelectedSummary, alinhando estilo de console com o agente UX.
+	- Padrão: GetHelpDescription deve iniciar com bloco de título (Nome - Descrição) seguido de seção Usage com sintaxe `app [options]` ou equivalente fornecida pelo ProgramDefinitionAttribute; linhas subsequentes listam opções agrupadas alinhando coluna dos nomes em 28 caracteres e descrição após dois espaços.
+	- Padrão: Cada grupo listado em GetHelpDescription deve ser antecedido por cabeçalho `Group: Nome (Requirement: Etiqueta)` e, quando houver descrição, apendice ` - Descrição`; opções dentro do grupo devem manter indentação dupla de quatro espaços.
+	- Padrão: Quando Help contém exemplos adicionais, eles devem ser apresentados em seção Examples com prefixo `>`, garantindo contraste visual solicitado pelo UX Specialist.
+	- Padrão: GetSelectedSummary deve produzir bloco iniciado por `Selected Options:` e listar apenas opções efetivamente preenchidas; cada linha deve ter formato `--option (alias -x, group Nome) => valor` com valores booleanos exibidos como `true`/`false` e valores string entre aspas quando contiverem espaços.
+	- Padrão: Em GetSelectedSummary, grupos com múltiplas escolhas devem ser agrupados em blocos separados com linha em branco entre grupos para leitura rápida; quando nenhuma opção for selecionada, retornar mensagem `No options were selected.` validada pelo UX Specialist.
 
 ## Épico 2 - Infraestrutura do ParseResult
 2.1 Introduzir a classe ParseResult<T> com propriedades Help, HasErrors, Errors e Options/Value documentadas.
