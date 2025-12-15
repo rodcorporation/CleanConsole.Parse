@@ -142,4 +142,64 @@ public class GroupTests
         Assert.Contains("permite no máximo uma opção", ex.Message);
         Assert.Contains("foram fornecidas: 2", ex.Message);
     }
+
+    // --- All Tests ---
+
+    [ProgramDefinition(Name = "Test", Description = "Test")]
+    [OptionGroup("AllRequired", OptionGroupRequirement.All)]
+    [OptionGroup("Modes", OptionGroupRequirement.AtLeastOne)]
+    private class AllGroupConfig
+    {
+        [Option("source", Group = "AllRequired")]
+        public string? Source { get; set; }
+
+        [Option("retries", Group = "AllRequired")]
+        public int Retries { get; set; }
+
+        [Option("verbose", Group = "AllRequired")]
+        public bool Verbose { get; set; }
+
+        [Option("mode", Group = "Modes")]
+        public string? Mode { get; set; }
+
+        [Option("level", Group = "Modes")]
+        public string? Level { get; set; }
+    }
+
+    [Fact]
+    public void Should_Succeed_When_All_Group_Is_Complete()
+    {
+        var result = CleanParser.Parse<AllGroupConfig>(new[] { "-source:input", "-retries:3", "-verbose", "-mode:copy" });
+        Assert.Equal("input", result.Source);
+        Assert.Equal(3, result.Retries);
+        Assert.True(result.Verbose);
+        Assert.Equal("copy", result.Mode);
+    }
+
+    [Fact]
+    public void Should_Throw_When_All_Group_Missing_Single_Option()
+    {
+        var ex = Assert.Throws<CleanParserException>(() =>
+            CleanParser.Parse<AllGroupConfig>(new[] { "-source:input", "-verbose", "-mode:copy" }));
+        Assert.Contains("Todas as opções do grupo", ex.Message);
+        Assert.Contains("--retries", ex.Message);
+    }
+
+    [Fact]
+    public void Should_Throw_When_All_Group_Missing_Multiple_Options()
+    {
+        var ex = Assert.Throws<CleanParserException>(() =>
+            CleanParser.Parse<AllGroupConfig>(new[] { "-retries:3", "-mode:copy" }));
+        Assert.Contains("Todas as opções do grupo", ex.Message);
+        Assert.Contains("--source", ex.Message);
+        Assert.Contains("--verbose", ex.Message);
+    }
+
+    [Fact]
+    public void Should_Still_Validate_Other_Groups_When_All_Is_Satisfied()
+    {
+        var ex = Assert.Throws<CleanParserException>(() =>
+            CleanParser.Parse<AllGroupConfig>(new[] { "-source:input", "-retries:3", "-verbose" }));
+        Assert.Contains("Pelo menos uma opção do grupo 'Modes' deve ser fornecida", ex.Message);
+    }
 }

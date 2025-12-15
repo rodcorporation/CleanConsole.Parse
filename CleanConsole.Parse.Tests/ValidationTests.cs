@@ -1,3 +1,4 @@
+using System;
 using Xunit;
 using CleanConsole.Parse;
 
@@ -33,6 +34,13 @@ public class ValidationTests
          Assert.Contains("must not start with prefixes", ex.Message);
     }
 
+    [Fact]
+    public void Should_Throw_When_All_Group_Has_No_Options()
+    {
+        var ex = Assert.Throws<CleanParserException>(() => CleanParser.Parse<AllGroupWithoutOptions>(Array.Empty<string>()));
+        Assert.Contains("is marked as 'All'", ex.Message);
+    }
+
     [ProgramDefinition(Name = "Test", Description = "Test")]
     private class UnsupportedTypeConfig
     {
@@ -62,5 +70,13 @@ public class ValidationTests
     {
         [Option("-file")]
         public string? File { get; set; }
+    }
+
+    [ProgramDefinition(Name = "Test", Description = "Test")]
+    [OptionGroup("All", OptionGroupRequirement.All)]
+    private class AllGroupWithoutOptions
+    {
+        [Option("other")]
+        public string? Other { get; set; }
     }
 }
