@@ -112,7 +112,7 @@ public sealed class ParseResult<T> where T : class
         return new ParseResult<T>(options, true, help, EmptyErrors, selections ?? EmptySelections);
     }
 
-    internal static ParseResult<T> Failure(IEnumerable<ParseError> errors)
+    internal static ParseResult<T> Failure(IEnumerable<ParseError> errors, IReadOnlyList<ParsedOptionSnapshot>? selections = null)
     {
         if (errors is null) throw new ArgumentNullException(nameof(errors));
         var materialized = errors as IReadOnlyList<ParseError> ?? errors.ToList();
@@ -121,7 +121,7 @@ public sealed class ParseResult<T> where T : class
             throw new ArgumentException("At least one error is required to create a failure result.", nameof(errors));
         }
 
-        return new ParseResult<T>(null, false, null, materialized, EmptySelections);
+        return new ParseResult<T>(null, false, null, materialized, selections ?? EmptySelections);
     }
 }
 

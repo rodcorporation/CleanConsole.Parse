@@ -26,8 +26,8 @@ internal static class ParseResultFactory
     /// <summary>
     /// Creates an error parse result aggregating the provided errors.
     /// </summary>
-    internal static ParseResult<T> Failure<T>(IEnumerable<ParseError> errors) where T : class
+    internal static ParseResult<T> Failure<T>(IEnumerable<ParseError> errors, IReadOnlyList<ParsedOptionSnapshot>? selections = null) where T : class
     {
-        return ParseResult<T>.Failure(errors);
+        return ParseResult<T>.Failure(errors, selections);
     }
 }
