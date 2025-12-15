@@ -37,6 +37,10 @@
 
 ## Épico 4 - Gestão de Erros
 4.1 Mapear todos os pontos de CleanParser que hoje lançam CleanParserException ou outras exceções de parsing.
+	- Pontos: Tokenize lança em argumentos sem prefixo válido (erro de sintaxe RF04).
+	- Pontos: ValidateConfiguration cobre duplicidade de OptionGroup, tipos não suportados, nomes duplicados/ inválidos e grupos All vazios.
+	- Pontos: Durante parsing lança ao converter bool com valor inválido, detectar valor obrigatório ausente, converter int/double sem sucesso ou ao encontrar falha refletindo SetValue.
+	- Pontos: Regras de grupos geram exceções para ExactOne, AtLeastOne, AtMostOne e All com mensagens específicas sobre contagem ou opções ausentes.
 4.2 Converter cada ponto mapeado para preencher ParseResult.Errors e HasErrors, mantendo mensagens consistentes.
 4.3 Garantir que erros de validação de grupos e requisitos em [CleanConsole.Parse/Attributes](CleanConsole.Parse/Attributes) também alimentem ParseResult.
 
