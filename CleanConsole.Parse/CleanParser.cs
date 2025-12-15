@@ -32,9 +32,9 @@ public static class CleanParser
     /// Parses the current process command line arguments into an instance of type T.
     /// </summary>
     /// <typeparam name="T">The type to parse into. Must be a class with a parameterless constructor.</typeparam>
-    /// <returns>A populated instance of T.</returns>
+    /// <returns>A ParseResult containing the populated instance of T.</returns>
     /// <exception cref="CleanParserException">Thrown when configuration is invalid or parsing fails.</exception>
-    public static T Parse<T>() where T : class, new()
+    public static ParseResult<T> Parse<T>() where T : class, new()
     {
         var args = CommandLineArgsProvider.Invoke() ?? Array.Empty<string>();
         var effectiveArgs = args.Length > 0 && Path.IsPathRooted(args[0])
@@ -50,9 +50,9 @@ public static class CleanParser
     /// </summary>
     /// <typeparam name="T">The type to parse into. Must be a class with a parameterless constructor.</typeparam>
     /// <param name="args">The command line arguments.</param>
-    /// <returns>A populated instance of T.</returns>
+    /// <returns>A ParseResult containing the populated instance of T.</returns>
     /// <exception cref="CleanParserException">Thrown when configuration is invalid or parsing fails.</exception>
-    public static T Parse<T>(string[] args) where T : class, new()
+    public static ParseResult<T> Parse<T>(string[] args) where T : class, new()
     {
         var type = typeof(T);
         var metadata = BuildOptionMetadata(type);
@@ -204,7 +204,7 @@ public static class CleanParser
             PrintSummary(instance, metadata.Options);
         }
 
-        return instance;
+        return ParseResult<T>.Success(instance);
     }
 
     /// <summary>

@@ -59,6 +59,16 @@ public sealed class ParseResult<T> where T : class
     /// </summary>
     public bool IsSuccess => !HelpRequested && !HasErrors;
 
+    /// <summary>
+    /// Enables implicit conversion to the options instance for backward compatibility scenarios.
+    /// </summary>
+    /// <param name="result">The parse result to extract the value from.</param>
+    public static implicit operator T?(ParseResult<T> result)
+    {
+        if (result is null) throw new ArgumentNullException(nameof(result));
+        return result.Options;
+    }
+
     internal static ParseResult<T> Success(T options)
     {
         if (options is null) throw new ArgumentNullException(nameof(options));
