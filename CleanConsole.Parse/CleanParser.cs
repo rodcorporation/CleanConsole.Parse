@@ -204,7 +204,7 @@ public static class CleanParser
             PrintSummary(instance, metadata.Options);
         }
 
-        return ParseResult<T>.Success(instance);
+        return ParseResultFactory.Success(instance);
     }
 
     /// <summary>
