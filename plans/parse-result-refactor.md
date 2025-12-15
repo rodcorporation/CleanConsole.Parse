@@ -2,6 +2,9 @@
 
 ## Épico 1 - Descoberta e Alinhamento de Contrato
 1.1 Auditar CleanParser.Parse<T>() em [CleanConsole.Parse/CleanParser.cs](CleanConsole.Parse/CleanParser.cs) para documentar fluxos de sucesso, help e exceção.
+	- Resultado: fluxo de sucesso instancia T após as etapas BuildOptionMetadata, ValidateConfiguration, Tokenize e atribuição das propriedades opcionais; ao final, PrintSummary pode gerar saída quando o atributo ProgramDefinition tem PrintSummary = true.
+	- Resultado: fluxo de help não é tratado em Parse<T>(); o pedido de ajuda exige chamada explícita de CleanParser.GetHelpText<T>(), já que não há interceptação de --help, -h ou equivalente.
+	- Resultado: fluxos de exceção disparam CleanParserException em validações de configuração (nomes duplicados, tipos não suportados, grupos inválidos), tokenização sem prefixo (-, --, /), argumentos faltantes ou com tipagem incorreta e violações de regras de grupo (ExactOne, AtLeastOne, AtMostOne, All).
 1.2 Inventariar dependências e expectativas atuais nos testes de [CleanConsole.Parse.Tests](CleanConsole.Parse.Tests) e em atributos de [CleanConsole.Parse/Attributes](CleanConsole.Parse/Attributes).
 1.3 Definir com arquitetura e UX a estrutura final de ParseResult<T> (nomes, tipos e semântica de Help, HasErrors, Errors e Options/Value).
 1.4 Especificar requisitos de formato para GetHelpDescription e GetSelectedSummary, alinhando estilo de console com o agente UX.
