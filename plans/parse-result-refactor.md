@@ -13,6 +13,11 @@
 	- Observação: testes de grupos requerem contagem das opções por grupo aplicando ExactOne, AtLeastOne, AtMostOne e All, com mensagens contendo os valores numéricos reportados (por exemplo "foram fornecidas: 2").
 	- Observação: testes atuais não cobrem fluxo de help via Parse e dependem do atributo ProgramDefinition para ativar PrintSummary ou fornecer metadados ao GetHelpText.
 1.3 Definir com arquitetura e UX a estrutura final de ParseResult<T> (nomes, tipos e semântica de Help, HasErrors, Errors e Options/Value).
+	- Decisão: ParseResult<T> será uma classe selada no namespace CleanConsole.Parse com construtor interno e fábricas estáticas para sucesso, help e erro.
+	- Decisão: Propriedade Options (do tipo T?) expõe o objeto configurado quando o parsing conclui com sucesso ou quando help é solicitado após validação; Value será fornecida como alias somente leitura para manter semântica familiar.
+	- Decisão: Propriedade HasErrors (bool) reflete se Errors contém itens; Errors expõe IReadOnlyList<ParseError> onde ParseError encapsula mensagem, nome da opção (opcional) e enum ParseErrorKind (Configuration, Conversion, Syntax, GroupRule, HelpRequest).
+	- Decisão: Propriedade Help (ParseHelpPayload?) só é preenchida quando help é solicitado; o payload mantém Title, Description, Usage e coleções de opções e grupos pré-formatadas para consumo por GetHelpDescription e GetSelectedSummary.
+	- Decisão: Propriedade HelpRequested (bool) diferencia respostas de help sem tratar como erro; IsSuccess (bool) será exposta para indicar ausência de erros e help simultaneamente.
 1.4 Especificar requisitos de formato para GetHelpDescription e GetSelectedSummary, alinhando estilo de console com o agente UX.
 
 ## Épico 2 - Infraestrutura do ParseResult
