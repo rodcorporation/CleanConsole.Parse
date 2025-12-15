@@ -11,17 +11,20 @@ namespace CleanConsole.Parse;
 public sealed class ParseResult<T> where T : class
 {
     private static readonly IReadOnlyList<ParseError> EmptyErrors = Array.Empty<ParseError>();
+    private static readonly IReadOnlyList<ParsedOptionSnapshot> EmptySelections = Array.Empty<ParsedOptionSnapshot>();
 
     private ParseResult(
         T? options,
         bool helpRequested,
         ParseHelpPayload? help,
-        IReadOnlyList<ParseError> errors)
+        IReadOnlyList<ParseError> errors,
+        IReadOnlyList<ParsedOptionSnapshot> selections)
     {
         Options = options;
         HelpRequested = helpRequested;
         Help = help;
         Errors = errors ?? throw new ArgumentNullException(nameof(errors));
+        SelectedOptions = selections ?? throw new ArgumentNullException(nameof(selections));
     }
 
     /// <summary>
@@ -59,6 +62,8 @@ public sealed class ParseResult<T> where T : class
     /// </summary>
     public bool IsSuccess => !HelpRequested && !HasErrors;
 
+    internal IReadOnlyList<ParsedOptionSnapshot> SelectedOptions { get; }
+
     /// <summary>
     /// Builds the formatted help description based on the stored help payload.
     /// </summary>
@@ -73,6 +78,19 @@ public sealed class ParseResult<T> where T : class
     }
 
     /// <summary>
+    /// Builds the formatted summary of the selected options.
+    /// </summary>
+    public string GetSelectedSummary()
+    {
+        if (SelectedOptions.Count == 0)
+        {
+            return "No options were selected.";
+        }
+
+        return ParseResultFormatter.BuildSelectedSummary(this);
+    }
+
+    /// <summary>
     /// Enables implicit conversion to the options instance for backward compatibility scenarios.
     /// </summary>
     /// <param name="result">The parse result to extract the value from.</param>
@@ -82,16 +100,16 @@ public sealed class ParseResult<T> where T : class
         return result.Options;
     }
 
-    internal static ParseResult<T> Success(T options)
+    internal static ParseResult<T> Success(T options, IReadOnlyList<ParsedOptionSnapshot> selections)
     {
         if (options is null) throw new ArgumentNullException(nameof(options));
-        return new ParseResult<T>(options, false, null, EmptyErrors);
+        return new ParseResult<T>(options, false, null, EmptyErrors, selections ?? EmptySelections);
     }
 
-    internal static ParseResult<T> HelpResponse(T? options, ParseHelpPayload help)
+    internal static ParseResult<T> HelpResponse(T? options, ParseHelpPayload help, IReadOnlyList<ParsedOptionSnapshot> selections)
     {
         if (help is null) throw new ArgumentNullException(nameof(help));
-        return new ParseResult<T>(options, true, help, EmptyErrors);
+        return new ParseResult<T>(options, true, help, EmptyErrors, selections ?? EmptySelections);
     }
 
     internal static ParseResult<T> Failure(IEnumerable<ParseError> errors)
@@ -103,7 +121,7 @@ public sealed class ParseResult<T> where T : class
             throw new ArgumentException("At least one error is required to create a failure result.", nameof(errors));
         }
 
-        return new ParseResult<T>(null, false, null, materialized);
+        return new ParseResult<T>(null, false, null, materialized, EmptySelections);
     }
 }
 

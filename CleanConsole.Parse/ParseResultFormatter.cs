@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -89,6 +90,52 @@ internal static class ParseResultFormatter
         return sb.ToString().TrimEnd();
     }
 
+    internal static string BuildSelectedSummary<T>(ParseResult<T> result) where T : class
+    {
+        if (result == null) throw new ArgumentNullException(nameof(result));
+
+        if (result.SelectedOptions.Count == 0)
+        {
+            return "No options were selected.";
+        }
+
+        var sb = new StringBuilder();
+
+        var ungrouped = result.SelectedOptions
+            .Where(selection => string.IsNullOrEmpty(selection.GroupName))
+            .ToList();
+
+        if (ungrouped.Count > 0)
+        {
+            sb.AppendLine("Selected Options:");
+            foreach (var option in ungrouped)
+            {
+                sb.AppendLine(FormatSelectionLine(option));
+            }
+        }
+
+        var grouped = result.SelectedOptions
+            .Where(selection => !string.IsNullOrEmpty(selection.GroupName))
+            .GroupBy(selection => selection.GroupName!, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        foreach (var group in grouped)
+        {
+            if (sb.Length > 0)
+            {
+                sb.AppendLine();
+            }
+
+            sb.AppendLine($"Group: {group.Key}");
+            foreach (var option in group)
+            {
+                sb.AppendLine(FormatSelectionLine(option));
+            }
+        }
+
+        return sb.ToString().TrimEnd();
+    }
+
     private static string FormatOptionLine(ParseHelpOption option)
     {
         var shortName = !string.IsNullOrEmpty(option.ShortName) ? $"-{option.ShortName}, " : "    ";
@@ -106,6 +153,60 @@ internal static class ParseResultFormatter
         }
 
         return line.TrimEnd();
+    }
+
+    private static string FormatSelectionLine(ParsedOptionSnapshot option)
+    {
+        var metadataSegments = new List<string>();
+
+        if (!string.IsNullOrEmpty(option.ShortName))
+        {
+            metadataSegments.Add($"alias -{option.ShortName}");
+        }
+
+        if (!string.IsNullOrEmpty(option.GroupName))
+        {
+            metadataSegments.Add($"group {option.GroupName}");
+        }
+
+        var metadata = metadataSegments.Count > 0
+            ? $" ({string.Join(", ", metadataSegments)})"
+            : string.Empty;
+
+        var valueText = FormatValue(option.Value, option.ValueType);
+
+        return $"  --{option.LongName}{metadata} => {valueText}";
+    }
+
+    private static string FormatValue(object? value, Type valueType)
+    {
+        if (value is null)
+        {
+            return "null";
+        }
+
+        if (valueType == typeof(bool))
+        {
+            return ((bool)value) ? "true" : "false";
+        }
+
+        if (valueType == typeof(string))
+        {
+            var text = value as string ?? string.Empty;
+            if (string.IsNullOrEmpty(text))
+            {
+                return "\"\"";
+            }
+
+            return text.Any(char.IsWhiteSpace) ? $"\"{text}\"" : text;
+        }
+
+        if (value is IFormattable formattable)
+        {
+            return formattable.ToString(null, CultureInfo.InvariantCulture);
+        }
+
+        return value.ToString() ?? string.Empty;
     }
 
     private static string FormatRequirementLabel(OptionGroupRequirement requirement)

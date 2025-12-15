@@ -10,17 +10,17 @@ internal static class ParseResultFactory
     /// <summary>
     /// Creates a successful parse result for the provided options instance.
     /// </summary>
-    internal static ParseResult<T> Success<T>(T options) where T : class
+    internal static ParseResult<T> Success<T>(T options, IReadOnlyList<ParsedOptionSnapshot> selections) where T : class
     {
-        return ParseResult<T>.Success(options);
+        return ParseResult<T>.Success(options, selections);
     }
 
     /// <summary>
     /// Creates a help response parse result preserving the parsed options.
     /// </summary>
-    internal static ParseResult<T> Help<T>(T? options, ParseHelpPayload help) where T : class
+    internal static ParseResult<T> Help<T>(T? options, ParseHelpPayload help, IReadOnlyList<ParsedOptionSnapshot> selections) where T : class
     {
-        return ParseResult<T>.HelpResponse(options, help);
+        return ParseResult<T>.HelpResponse(options, help, selections);
     }
 
     /// <summary>

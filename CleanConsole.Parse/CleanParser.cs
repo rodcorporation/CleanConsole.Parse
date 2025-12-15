@@ -61,6 +61,7 @@ public static class CleanParser
 
         var helpRequested = TryFilterHelpTokens(args, out var filteredArgs);
         var helpPayload = helpRequested ? BuildHelpPayload(metadata) : null;
+        var selections = new List<ParsedOptionSnapshot>();
 
         List<(string Key, string? Value)> tokens;
         try
@@ -69,7 +70,7 @@ public static class CleanParser
         }
         catch (CleanParserException) when (helpRequested)
         {
-            return ParseResultFactory.Help(new T(), helpPayload ?? BuildHelpPayload(metadata));
+            return ParseResultFactory.Help(new T(), helpPayload ?? BuildHelpPayload(metadata), selections);
         }
 
         var instance = new T();
@@ -106,12 +107,14 @@ public static class CleanParser
                     if (match.Value == null)
                     {
                         option.Property.SetValue(instance, true);
+                        RecordSelection(selections, option, true);
                     }
                     else
                     {
                         if (bool.TryParse(match.Value, out bool boolResult))
                         {
                             option.Property.SetValue(instance, boolResult);
+                            RecordSelection(selections, option, boolResult);
                         }
                         else if (!helpRequested)
                         {
@@ -164,7 +167,12 @@ public static class CleanParser
 
                         if (convertedValue != null || option.Property.PropertyType == typeof(string))
                         {
-                            option.Property.SetValue(instance, convertedValue);
+                            object? assignedValue = option.Property.PropertyType == typeof(string)
+                                ? match.Value
+                                : convertedValue;
+
+                            option.Property.SetValue(instance, assignedValue);
+                            RecordSelection(selections, option, assignedValue);
                         }
                     }
                     catch (Exception ex) when (ex is not CleanParserException)
@@ -227,12 +235,12 @@ public static class CleanParser
         }
         catch (CleanParserException) when (helpRequested)
         {
-            return ParseResultFactory.Help(instance, helpPayload ?? BuildHelpPayload(metadata));
+            return ParseResultFactory.Help(instance, helpPayload ?? BuildHelpPayload(metadata), selections);
         }
 
         if (helpRequested)
         {
-            return ParseResultFactory.Help(instance, helpPayload ?? BuildHelpPayload(metadata));
+            return ParseResultFactory.Help(instance, helpPayload ?? BuildHelpPayload(metadata), selections);
         }
 
         var programDef = type.GetCustomAttribute<ProgramDefinitionAttribute>();
@@ -241,7 +249,7 @@ public static class CleanParser
             PrintSummary(instance, metadata.Options);
         }
 
-        return ParseResultFactory.Success(instance);
+        return ParseResultFactory.Success(instance, selections);
     }
 
     /// <summary>
@@ -331,6 +339,22 @@ public static class CleanParser
         }
 
         return line;
+    }
+
+    private static void RecordSelection(List<ParsedOptionSnapshot> selections, OptionDescriptor option, object? value)
+    {
+        if (selections == null)
+        {
+            return;
+        }
+
+        selections.Add(new ParsedOptionSnapshot(
+            option.Attribute.OptionName,
+            option.Attribute.ShortOptionName,
+            option.Attribute.Group,
+            value,
+            option.Property.PropertyType,
+            option.Property.PropertyType != typeof(bool)));
     }
 
     private static bool TryFilterHelpTokens(string[] args, out string[] filteredArgs)
